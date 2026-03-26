@@ -52,13 +52,15 @@ export default function App() {
   }, [notif, settings.reminderTime]);
 
   useEffect(() => {
-    if (!notif || !navigator.serviceWorker?.controller) return;
-    navigator.serviceWorker.controller.postMessage({
-      type: 'SCHEDULE_NOTIFICATION',
-      time: settings.reminderTime,
-      title: '💰 ' + t.appName,
-      body: t.reminderHint,
-      icon: import.meta.env.BASE_URL + 'icons/icon-192.png',
+    if (!notif) return;
+    navigator.serviceWorker?.ready.then(reg => {
+      reg.active?.postMessage({
+        type: 'SCHEDULE_NOTIFICATION',
+        time: settings.reminderTime,
+        title: '💰 ' + t.appName,
+        body: t.reminderHint,
+        icon: import.meta.env.BASE_URL + 'icons/icon-192.png',
+      });
     });
   }, [notif, settings.reminderTime]);
 

@@ -55,27 +55,41 @@ Once your app is live at any URL above:
 6. Confirm — the app icon appears on your home screen
 7. Tap it — it opens fullscreen like a native app ✅
 
-### What you get after installing:
-- Fullscreen experience (no browser bar)
-- Works offline (service worker caches everything)
-- App icon on home screen
-- Loads instantly on reopen
-- Persists all your data in local storage
+---
+
+## Installing as PWA on iPhone / iPad (iOS)
+
+> Requires iOS 16.4+ for notification support. The app itself works on any iOS version.
+
+1. Open **Safari** on your iPhone (must be Safari, not Chrome)
+2. Navigate to your app URL
+3. The app shows a banner: **"Tap ⬆ Share → Add to Home Screen to install"**
+4. Tap the **Share button (⬆)** at the bottom of Safari
+5. Scroll down and tap **"Add to Home Screen"**
+6. Tap **"Add"** — the app icon appears on your home screen
+7. Tap it — it opens fullscreen like a native app ✅
+
+### After installing on iOS:
+- Open the app from the home screen icon
+- Go to **Settings (⚙️)** → tap **"Enable reminders"** to grant notification permission
 
 ---
 
 ## Enabling Daily Reminders
 
-After installing:
-1. Open the app → go to **Settings (⚙️)**
-2. Tap **"Enable Notifications"**
-3. Allow when Android asks for permission
-4. Set your preferred reminder time (default 9 PM)
+After installing the PWA (Android or iOS 16.4+):
 
-> Note: For scheduled daily push notifications without a backend,
-> you can use a free service like **OneSignal** (onesignal.com)
-> and integrate it with a single script tag. Let me know if you want
-> that added.
+1. Open the app → go to **Settings (⚙️)**
+2. Tap **"Enable reminders"** and allow when prompted
+3. Set your preferred reminder time (default 9 PM)
+4. The app schedules a daily notification at that time
+
+**How reminders work:**
+- **Chrome (Android & desktop):** uses the Notification Triggers API — the OS schedules the notification at the exact time, so it fires even when Chrome is fully closed. Re-schedules automatically each day when you interact with (or dismiss) the notification; also re-schedules whenever you open the app.
+- **While the app is open:** a JavaScript timer fires at exactly your set time (all browsers).
+- **iOS background:** notification fires while the app is open or in recent memory. iOS does not support OS-level scheduled notifications in PWAs.
+
+> **iOS note:** Notifications on iOS require the app to be installed to the Home Screen and iOS 16.4 or later. The app shows a note in Settings if your device doesn't support it yet.
 
 ---
 
