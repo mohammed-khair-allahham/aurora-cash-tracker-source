@@ -1,9 +1,15 @@
+import { useState } from "react";
 import GlassCard from "../components/GlassCard";
 import GlowBg from "../components/GlowBg";
 import { cat } from "../constants";
-import { todayStr, yesterdayStr, fmtDate, fmtAmt } from "../utils";
+import { todayStr, yesterdayStr, fmtDate, fmtAmt, ls, lsSet } from "../utils";
 
 export default function HomeScreen({ expenses, theme, isDark, t, lang, curr, notif, onRequestNotif, onEdit, onDelete }) {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+  const [iosDismissed, setIosDismissed] = useState(() => ls('iosHintDismissed', false));
   const fmt = (n) => fmtAmt(n, curr.symbol, lang);
   const catColor = (id) => isDark ? cat(id).colorDark : cat(id).colorLight;
 
@@ -54,8 +60,28 @@ export default function HomeScreen({ expenses, theme, isDark, t, lang, curr, not
           </div>
         </div>
 
+        {/* iOS install banner */}
+        {isIOS && !isStandalone && !iosDismissed && (
+          <div style={{
+            background: isDark ? "rgba(251,191,36,0.12)" : "rgba(234,179,8,0.10)",
+            border: `1px solid ${isDark ? "rgba(251,191,36,0.3)" : "rgba(234,179,8,0.35)"}`,
+            borderRadius: 12, padding: "10px 14px",
+            display: "flex", alignItems: "center", gap: 10,
+            marginBottom: 12,
+          }}>
+            <span style={{ fontSize: 16 }}>📲</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: isDark ? "#fde68a" : "#92400e", flex: 1 }}>{t.iosInstallHint}</span>
+            <button onClick={() => { lsSet('iosHintDismissed', true); setIosDismissed(true); }} style={{
+              background: "none", border: "none", cursor: "pointer",
+              fontSize: 11, fontWeight: 700, color: isDark ? "#fde68a" : "#92400e",
+              padding: "4px 8px", borderRadius: 6,
+              backdropFilter: "blur(4px)",
+            }}>{t.iosInstallDismiss}</button>
+          </div>
+        )}
+
         {/* Notification banner */}
-        {!notif && (
+        {!notif && (!isIOS || isStandalone) && (
           <div onClick={onRequestNotif} style={{
             background: isDark ? "rgba(251,191,36,0.12)" : "rgba(234,179,8,0.10)",
             border: `1px solid ${isDark ? "rgba(251,191,36,0.3)" : "rgba(234,179,8,0.35)"}`,

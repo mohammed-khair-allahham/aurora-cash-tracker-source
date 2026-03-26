@@ -43,6 +43,9 @@ const T = {
     version: "Aurora Cash Tracker v2.0",
     enableNotif: "Enable reminders",
     reminderHint: "We'll nudge you daily to log your spending",
+    iosInstallHint: "Tap ⬆ Share → \"Add to Home Screen\" to install",
+    iosInstallDismiss: "Got it",
+    iosNotifNote: "Notifications need iOS 16.4+ and Home Screen install",
     cats: {
       food: "Food", transport: "Transport", groceries: "Groceries",
       entertainment: "Entertainment", health: "Health", home: "Home",
@@ -94,6 +97,9 @@ const T = {
     version: "متتبع النقد أورورا v2.0",
     enableNotif: "تفعيل التذكيرات",
     reminderHint: "سنذكّرك يومياً لتسجيل مصاريفك",
+    iosInstallHint: "اضغط ⬆ مشاركة ← \"إضافة للشاشة الرئيسية\" للتثبيت",
+    iosInstallDismiss: "حسناً",
+    iosNotifNote: "تحتاج الإشعارات iOS 16.4+ وتثبيت التطبيق",
     cats: {
       food: "طعام", transport: "مواصلات", groceries: "بقالة",
       entertainment: "ترفيه", health: "صحة", home: "منزل",

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import T from "./i18n";
 import { SCREENS, CURRENCIES, DARK, LIGHT } from "./constants";
 import { ls, lsSet } from "./utils";
@@ -28,6 +28,39 @@ export default function App() {
 
   useEffect(() => { lsSet("ct_expenses", expenses); }, [expenses]);
   useEffect(() => { lsSet("ct_settings", settings); }, [settings]);
+
+  const notifTimerRef = useRef(null);
+  useEffect(() => {
+    clearTimeout(notifTimerRef.current);
+    if (!notif) return;
+    const schedule = () => {
+      const [h, m] = settings.reminderTime.split(':').map(Number);
+      const now = new Date();
+      const next = new Date();
+      next.setHours(h, m, 0, 0);
+      if (next <= now) next.setDate(next.getDate() + 1);
+      notifTimerRef.current = setTimeout(() => {
+        new Notification('💰 ' + t.appName, {
+          body: t.reminderHint,
+          icon: import.meta.env.BASE_URL + 'icons/icon-192.png',
+        });
+        schedule();
+      }, next - now);
+    };
+    schedule();
+    return () => clearTimeout(notifTimerRef.current);
+  }, [notif, settings.reminderTime]);
+
+  useEffect(() => {
+    if (!notif || !navigator.serviceWorker?.controller) return;
+    navigator.serviceWorker.controller.postMessage({
+      type: 'SCHEDULE_NOTIFICATION',
+      time: settings.reminderTime,
+      title: '💰 ' + t.appName,
+      body: t.reminderHint,
+      icon: import.meta.env.BASE_URL + 'icons/icon-192.png',
+    });
+  }, [notif, settings.reminderTime]);
 
   const requestNotif = async () => {
     if ("Notification" in window) {

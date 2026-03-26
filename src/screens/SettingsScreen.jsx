@@ -40,6 +40,10 @@ function ToggleGroup({ options, value, onChange, theme, isDark }) {
 export default function SettingsScreen({ settings, onChange, theme, isDark, t, notif, onRequestNotif, onClear }) {
   const [confirmClear, setConfirmClear] = useState(false);
   const set = (key, val) => onChange(s => ({ ...s, [key]: val }));
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
 
   return (
     <div style={{ minHeight: "100vh", position: "relative" }}>
@@ -99,16 +103,23 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, n
                 />
               </div>
             ) : (
-              <button onClick={onRequestNotif} style={{
-                width: "100%", padding: "14px",
-                background: "none", border: "none",
-                color: isDark ? "#fbbf24" : "#d97706",
-                fontSize: 14, cursor: "pointer",
-                fontWeight: 700, fontFamily: "inherit",
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-              }}>
-                <span>🔔</span> {t.enableNotif}
-              </button>
+              <div>
+                <button onClick={onRequestNotif} style={{
+                  width: "100%", padding: "14px",
+                  background: "none", border: "none",
+                  color: isDark ? "#fbbf24" : "#d97706",
+                  fontSize: 14, cursor: "pointer",
+                  fontWeight: 700, fontFamily: "inherit",
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                }}>
+                  <span>🔔</span> {t.enableNotif}
+                </button>
+                {isIOS && !isStandalone && (
+                  <div style={{ fontSize: 11, color: theme.textMuted, textAlign: "center", padding: "0 12px 10px" }}>
+                    {t.iosNotifNote}
+                  </div>
+                )}
+              </div>
             )}
           </GlassCard>
         </Section>
