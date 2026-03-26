@@ -28,13 +28,18 @@
 
 ---
 
-## Option C — GitHub Pages (Free, permanent)
+## Option C — GitHub Pages with Auto-Deploy (Free, permanent)
 
-1. Create a free account at https://github.com
-2. Create a new repository (e.g. `cash-tracker`)
-3. Extract the `dist` folder and push all files inside it to the repo
-4. Go to repo **Settings → Pages → Source: main branch / root**
-5. Your app is live at `https://yourusername.github.io/cash-tracker`
+This repo is already configured for automatic GitHub Pages deployment via GitHub Actions.
+Every push to `master` triggers a fresh build and deploys it automatically.
+
+**One-time setup:**
+1. Push this repo to GitHub (any repo name, e.g. `aurora-cash-tracker-source`)
+2. Go to repo **Settings → Pages → Build and deployment → Source → "GitHub Actions"**
+3. Your app is live at `https://yourusername.github.io/your-repo-name/` after the first push
+
+> **Note:** The base path in `vite.config.js` is set to `/aurora-cash-tracker-source/` to match
+> the repo name. If you use a different repo name, update that value in `vite.config.js`.
 
 ---
 
@@ -83,10 +88,15 @@ On Vercel: Project settings → Domains → Add
 
 ## Updating the App
 
-If you want to make changes:
-1. Extract **aurora-cash-tracker-source.zip**
-2. Run `npm install` then edit `src/App.jsx`
-3. Run `npm run build` — a new `dist/` folder is created
-4. Re-upload `dist/` to Netlify/Vercel
-5. The PWA auto-updates on users' phones within minutes
+**With GitHub Pages (CI/CD — recommended):**
+1. Edit `src/App.jsx`
+2. Commit and push to `master`
+3. GitHub Actions builds and deploys automatically (~60–90 seconds)
+4. The PWA auto-updates on users' phones within minutes
+
+**With Netlify/Vercel:**
+1. Edit `src/App.jsx`
+2. Run `npm install --legacy-peer-deps` then `npm run build`
+3. Re-upload the `dist/` folder
+4. The PWA auto-updates on users' phones within minutes
 
