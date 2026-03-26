@@ -40,7 +40,7 @@ const T = {
     cancel: "Cancel",
     confirm: "Yes, Clear",
     dataInfo: "All data stored locally on your device",
-    version: "Aurora Cash Tracker v2.0",
+    version: "Aurora Spending Tracker v2.0",
     enableNotif: "Enable reminders",
     reminderHint: "We'll nudge you daily to log your spending",
     iosInstallHint: "Tap ⬆ Share → \"Add to Home Screen\" to install",

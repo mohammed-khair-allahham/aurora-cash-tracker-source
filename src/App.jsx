@@ -12,7 +12,9 @@ export default function App() {
   const [screen,    setScreen]    = useState(SCREENS.HOME);
   const [expenses,  setExpenses]  = useState(() => ls("ct_expenses", []));
   const [settings,  setSettings]  = useState(() => ({
-    currency: "SYP", lang: "ar", theme: "dark", reminderTime: "21:00",
+    currency: "SYP", lang: "ar",
+    theme: window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light",
+    reminderTime: "21:00",
     ...ls("ct_settings", {}),
   }));
   const [editingId, setEditingId] = useState(null);
