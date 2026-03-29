@@ -31,11 +31,11 @@ export default function HomeScreen({ expenses, theme, isDark, t, lang, curr, not
   );
 
   return (
-    <div style={{ minHeight: "100vh" }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <GlowBg theme={theme} style={{ position: "fixed" }} />
 
-      {/* Header — sticky so only the list scrolls */}
-      <div style={{ padding: "56px 24px 20px", position: "sticky", top: 0, zIndex: 10, background: theme.bg }}>
+      {/* Header — fixed in place, never scrolls */}
+      <div style={{ padding: "56px 24px 20px", flexShrink: 0, position: "relative", zIndex: 1, background: theme.bg }}>
 
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
@@ -134,8 +134,8 @@ export default function HomeScreen({ expenses, theme, isDark, t, lang, curr, not
         )}
       </div>
 
-      {/* Transaction list */}
-      <div style={{ padding: "0 16px", position: "relative" }}>
+      {/* Transaction list — only this scrolls */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "0 16px", paddingBottom: 84, position: "relative", zIndex: 1 }}>
         {grouped.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px 24px", color: theme.textMuted }}>
             <div style={{ fontSize: 52, marginBottom: 16 }}>💸</div>

@@ -24,9 +24,9 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
   };
 
   return (
-    <div style={{ minHeight: "100vh", position: "relative" }}>
+    <div style={{ height: "100%", overflowY: "auto", position: "relative" }}>
       <GlowBg theme={theme} />
-      <div style={{ padding: "52px 20px 24px", position: "relative", zIndex: 1 }}>
+      <div style={{ padding: "52px 20px 84px", position: "relative", zIndex: 1 }}>
 
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>

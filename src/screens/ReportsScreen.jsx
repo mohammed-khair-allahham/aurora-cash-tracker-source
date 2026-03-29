@@ -49,9 +49,9 @@ export default function ReportsScreen({ expenses, theme, isDark, t, lang, curr }
   const nextMonth = () => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); };
 
   return (
-    <div style={{ minHeight: "100vh", position: "relative" }}>
+    <div style={{ height: "100%", overflowY: "auto", position: "relative" }}>
       <GlowBg theme={theme} />
-      <div style={{ padding: "52px 20px 24px", position: "relative", zIndex: 1 }}>
+      <div style={{ padding: "52px 20px 84px", position: "relative", zIndex: 1 }}>
         <h2 style={{ margin: "0 0 22px", fontWeight: 900, fontSize: 26, color: theme.text }}>📊 {t.reports}</h2>
 
         {/* Month navigator */}

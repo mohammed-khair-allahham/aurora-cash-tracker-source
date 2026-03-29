@@ -46,9 +46,9 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, n
     window.navigator.standalone === true;
 
   return (
-    <div style={{ minHeight: "100vh", position: "relative" }}>
+    <div style={{ height: "100%", overflowY: "auto", position: "relative" }}>
       <GlowBg theme={theme} />
-      <div style={{ padding: "52px 20px 24px", position: "relative", zIndex: 1 }}>
+      <div style={{ padding: "52px 20px 84px", position: "relative", zIndex: 1 }}>
         <h2 style={{ margin: "0 0 28px", fontWeight: 900, fontSize: 26, color: theme.text }}>⚙️ {t.settings}</h2>
 
         <Section title={t.language} theme={theme}>

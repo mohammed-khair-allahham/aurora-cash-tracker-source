@@ -122,7 +122,7 @@ export default function App() {
         rel="stylesheet"
       />
 
-      <div style={{ flex: 1, overflowY: "auto", paddingBottom: 84 }}>
+      <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
         {screen === SCREENS.HOME && (
           <HomeScreen
             {...commonProps}
