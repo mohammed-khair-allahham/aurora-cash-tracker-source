@@ -16,10 +16,11 @@ export default function HomeScreen({ expenses, theme, isDark, t, lang, curr, not
   const todayExp = expenses.filter(e => e.date === todayStr());
   const todayTotal = todayExp.reduce((s, e) => s + Number(e.amount), 0);
 
-  // Group expenses by date (most recent 60)
+  // Group expenses by date (most recent 60), newest first
+  const sorted = [...expenses].sort((a, b) => b.date.localeCompare(a.date));
   const grouped = [];
   const seen = {};
-  expenses.slice(0, 60).forEach(e => {
+  sorted.slice(0, 60).forEach(e => {
     if (!seen[e.date]) { seen[e.date] = true; grouped.push({ date: e.date, items: [] }); }
     grouped.find(g => g.date === e.date).items.push(e);
   });
