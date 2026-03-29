@@ -149,11 +149,14 @@ export default function HomeScreen({ expenses, theme, isDark, t, lang, curr, not
               fontSize: 11, fontWeight: 700, color: theme.textMuted,
               letterSpacing: 1.2, textTransform: "uppercase",
               padding: "8px 8px 6px", marginTop: 4,
+              display: "flex", alignItems: "center", justifyContent: "space-between",
             }}>
-              {group.date === todayStr() ? t.today
-                : group.date === yesterdayStr() ? t.yesterday
-                : fmtDate(group.date, lang, t.months)}
-              <span style={{ marginInlineStart: 8, fontWeight: 800, color: theme.accent1, fontSize: 12 }}>
+              <span>
+                {group.date === todayStr() ? t.today
+                  : group.date === yesterdayStr() ? t.yesterday
+                  : fmtDate(group.date, lang, t.months)}
+              </span>
+              <span style={{ fontWeight: 800, color: theme.accent1, fontSize: 12, direction: "ltr" }}>
                 {fmt(group.items.reduce((s, e) => s + Number(e.amount), 0))}
               </span>
             </div>
