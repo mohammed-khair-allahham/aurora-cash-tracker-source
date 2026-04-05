@@ -81,6 +81,47 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, n
           />
         </Section>
 
+        <Section title={`💰 ${t.wallet}`} theme={theme}>
+          <GlassCard theme={theme} style={{ padding: "14px 16px" }}>
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: theme.textSub, marginBottom: 8 }}>{t.walletBalance}</div>
+              <input
+                type="number"
+                value={settings.walletBalance || ""}
+                onChange={e => set("walletBalance", e.target.value === "" ? 0 : Number(e.target.value))}
+                placeholder="0"
+                style={{
+                  width: "100%", boxSizing: "border-box",
+                  background: theme.inputBg,
+                  border: `1px solid ${theme.inputBorder}`,
+                  borderRadius: 10, padding: "12px 14px",
+                  color: theme.text, fontSize: 15,
+                  fontFamily: "inherit", outline: "none",
+                  colorScheme: isDark ? "dark" : "light",
+                }}
+              />
+            </div>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: theme.textSub, marginBottom: 8 }}>{t.monthlyBudget}</div>
+              <input
+                type="number"
+                value={settings.monthlyBudget || ""}
+                onChange={e => set("monthlyBudget", e.target.value === "" ? 0 : Number(e.target.value))}
+                placeholder="0"
+                style={{
+                  width: "100%", boxSizing: "border-box",
+                  background: theme.inputBg,
+                  border: `1px solid ${theme.inputBorder}`,
+                  borderRadius: 10, padding: "12px 14px",
+                  color: theme.text, fontSize: 15,
+                  fontFamily: "inherit", outline: "none",
+                  colorScheme: isDark ? "dark" : "light",
+                }}
+              />
+            </div>
+          </GlassCard>
+        </Section>
+
         <Section title={t.reminderTime} theme={theme}>
           <GlassCard theme={theme} style={{ padding: "4px 4px" }}>
             {notif ? (

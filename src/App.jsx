@@ -91,15 +91,23 @@ export default function App() {
 
   const saveExpense = (exp) => {
     if (editingId) {
+      const oldExp = expenses.find(e => e.id === editingId);
+      const diff = Number(exp.amount) - Number(oldExp?.amount || 0);
+      setSettings(s => ({ ...s, walletBalance: (s.walletBalance || 0) - diff }));
       setExpenses(p => p.map(e => e.id === editingId ? { ...exp, id: editingId } : e));
       setEditingId(null);
     } else {
+      setSettings(s => ({ ...s, walletBalance: (s.walletBalance || 0) - Number(exp.amount) }));
       setExpenses(p => [{ ...exp, id: Date.now().toString() }, ...p]);
     }
     setScreen(SCREENS.HOME);
   };
 
-  const deleteExpense = (id) => setExpenses(p => p.filter(e => e.id !== id));
+  const deleteExpense = (id) => {
+    const exp = expenses.find(e => e.id === id);
+    if (exp) setSettings(s => ({ ...s, walletBalance: (s.walletBalance || 0) + Number(exp.amount) }));
+    setExpenses(p => p.filter(e => e.id !== id));
+  };
 
   const startEdit = (exp) => {
     setEditingId(exp.id);
@@ -139,6 +147,7 @@ export default function App() {
         {screen === SCREENS.HOME && (
           <HomeScreen
             {...commonProps}
+            settings={settings}
             expenses={expenses}
             notif={notif}
             onRequestNotif={requestNotif}
@@ -167,6 +176,7 @@ export default function App() {
         {screen === SCREENS.REPORTS && (
           <ReportsScreen
             {...commonProps}
+            settings={settings}
             expenses={expenses}
           />
         )}

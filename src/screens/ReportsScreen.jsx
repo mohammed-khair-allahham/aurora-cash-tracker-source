@@ -14,7 +14,7 @@ function ChartTooltip({ active, payload, theme, fmt }) {
   );
 }
 
-export default function ReportsScreen({ expenses, theme, isDark, t, lang, curr }) {
+export default function ReportsScreen({ expenses, settings, theme, isDark, t, lang, curr }) {
   const fmt = (n) => fmtAmt(n, curr.symbol, lang);
 
   const now = new Date();
@@ -74,6 +74,14 @@ export default function ReportsScreen({ expenses, theme, isDark, t, lang, curr }
             <div style={{ fontSize: 11, color: theme.textSub, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>{t.monthlyTotal}</div>
             <div style={{ fontSize: 22, fontWeight: 900, background: theme.totalGrad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{fmt(monthTotal)}</div>
             <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4 }}>{monthExp.length} {t.transactions}</div>
+            {(settings.monthlyBudget || 0) > 0 && (() => {
+              const rem = (settings.monthlyBudget || 0) - monthTotal;
+              return (
+                <div style={{ fontSize: 11, color: rem >= 0 ? theme.accent1 : "#ef4444", marginTop: 4, fontWeight: 600 }}>
+                  {rem >= 0 ? t.remaining : t.overBudget}: {fmt(Math.abs(rem))}
+                </div>
+              );
+            })()}
           </GlassCard>
           <GlassCard theme={theme} style={{ padding: "16px 18px" }}>
             <div style={{ fontSize: 11, color: theme.textSub, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>{t.thisWeek}</div>

@@ -4,7 +4,7 @@ import GlowBg from "../components/GlowBg";
 import { cat } from "../constants";
 import { todayStr, fmtAmt, ls, lsSet } from "../utils";
 
-export default function HomeScreen({ expenses, theme, isDark, t, lang, curr, notif, onRequestNotif, onEdit, onDelete }) {
+export default function HomeScreen({ expenses, settings, theme, isDark, t, lang, curr, notif, onRequestNotif, onEdit, onDelete }) {
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
@@ -15,6 +15,16 @@ export default function HomeScreen({ expenses, theme, isDark, t, lang, curr, not
 
   const todayExp = expenses.filter(e => e.date === todayStr());
   const todayTotal = todayExp.reduce((s, e) => s + Number(e.amount), 0);
+
+  // Wallet & budget
+  const walletBalance = settings.walletBalance || 0;
+  const budget = settings.monthlyBudget || 0;
+  const now = new Date();
+  const monthSpent = expenses
+    .filter(e => { const d = new Date(e.date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); })
+    .reduce((s, e) => s + Number(e.amount), 0);
+  const budgetRemaining = budget - monthSpent;
+  const budgetPct = budget > 0 ? Math.min((monthSpent / budget) * 100, 100) : 0;
 
   // Category totals for today
   const todayCats = Object.entries(
@@ -85,6 +95,37 @@ export default function HomeScreen({ expenses, theme, isDark, t, lang, curr, not
             <span style={{ fontSize: 13, fontWeight: 600, color: isDark ? "#fde68a" : "#92400e" }}>{t.notifOff}</span>
           </div>
         )}
+
+        {/* Wallet card */}
+        <GlassCard theme={theme} style={{ padding: "16px 18px", marginBottom: 16 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 8 }}>
+            💰 {t.walletBalance}
+          </div>
+          <div style={{
+            fontSize: 28, fontWeight: 900,
+            color: walletBalance >= 0 ? theme.accent1 : "#ef4444",
+            lineHeight: 1.1,
+          }}>
+            {fmt(walletBalance)}
+          </div>
+          {budget > 0 && (
+            <div style={{ marginTop: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 600, marginBottom: 6 }}>
+                <span style={{ color: theme.textSub }}>{t.monthlyBudget}: {fmt(budget)}</span>
+                <span style={{ color: budgetRemaining >= 0 ? theme.accent1 : "#ef4444", fontWeight: 700 }}>
+                  {budgetRemaining >= 0 ? t.remaining : t.overBudget}: {fmt(Math.abs(budgetRemaining))}
+                </span>
+              </div>
+              <div style={{ height: 6, borderRadius: 3, background: theme.divider, overflow: "hidden" }}>
+                <div style={{
+                  height: "100%", borderRadius: 3,
+                  background: budgetRemaining >= 0 ? theme.btnGrad : "linear-gradient(90deg, #ef4444, #f97316)",
+                  width: `${budgetPct}%`, transition: "width 0.4s",
+                }} />
+              </div>
+            </div>
+          )}
+        </GlassCard>
 
         {/* Today's total */}
         <div style={{ fontSize: 12, fontWeight: 600, color: theme.textSub, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>
