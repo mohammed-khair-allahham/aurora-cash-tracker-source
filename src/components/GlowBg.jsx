@@ -18,16 +18,29 @@ export default function GlowBg({ theme, style = {} }) {
           0%,100% { transform: scaleX(0.95) scaleY(1.1) skewX(6deg);  opacity: 0.55; }
           50%      { transform: scaleX(1.08) scaleY(1.0) skewX(-6deg); opacity: 0.85; }
         }
+        @keyframes aur5 {
+          0%,100% { transform: scaleX(1.0) scaleY(1.0); opacity: 0.4; }
+          50%      { transform: scaleX(1.06) scaleY(1.1); opacity: 0.7; }
+        }
       `}</style>
       <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", ...style }}>
+        {/* Band 5: horizon glow — very top */}
+        <div style={{
+          position: "absolute", width: "200%", height: 120,
+          left: "-50%", top: "-2%",
+          borderRadius: "50%",
+          background: `radial-gradient(ellipse at center, ${theme.bgGlow5} 0%, transparent 70%)`,
+          filter: "blur(40px)",
+          animation: "aur5 18s ease-in-out infinite",
+        }} />
         {/* Band 1: aurora green — upper sky */}
         <div style={{
           position: "absolute", width: "190%", height: 240,
           left: "-45%", top: "6%",
           borderRadius: "50%",
           background: `radial-gradient(ellipse at center, ${theme.bgGlow1} 0%, transparent 68%)`,
-          filter: "blur(28px)",
-          animation: "aur1 9s ease-in-out infinite",
+          filter: "blur(36px)",
+          animation: "aur1 12s ease-in-out infinite",
         }} />
         {/* Band 2: aurora violet — mid-upper */}
         <div style={{
@@ -35,8 +48,8 @@ export default function GlowBg({ theme, style = {} }) {
           left: "-35%", top: "26%",
           borderRadius: "50%",
           background: `radial-gradient(ellipse at center, ${theme.bgGlow2} 0%, transparent 68%)`,
-          filter: "blur(32px)",
-          animation: "aur2 11s ease-in-out infinite",
+          filter: "blur(40px)",
+          animation: "aur2 14s ease-in-out infinite",
         }} />
         {/* Band 3: aurora cyan — mid-lower */}
         <div style={{
@@ -44,8 +57,8 @@ export default function GlowBg({ theme, style = {} }) {
           left: "-30%", top: "48%",
           borderRadius: "50%",
           background: `radial-gradient(ellipse at center, ${theme.bgGlow3} 0%, transparent 68%)`,
-          filter: "blur(24px)",
-          animation: "aur3 13s ease-in-out infinite",
+          filter: "blur(32px)",
+          animation: "aur3 16s ease-in-out infinite",
         }} />
         {/* Band 4: aurora magenta — lower sky */}
         <div style={{
@@ -53,8 +66,8 @@ export default function GlowBg({ theme, style = {} }) {
           left: "-40%", bottom: "4%",
           borderRadius: "50%",
           background: `radial-gradient(ellipse at center, ${theme.bgGlow4} 0%, transparent 68%)`,
-          filter: "blur(30px)",
-          animation: "aur4 15s ease-in-out infinite",
+          filter: "blur(36px)",
+          animation: "aur4 18s ease-in-out infinite",
         }} />
       </div>
     </>

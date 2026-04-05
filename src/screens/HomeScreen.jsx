@@ -1,6 +1,7 @@
 import { useState } from "react";
 import GlassCard from "../components/GlassCard";
 import GlowBg from "../components/GlowBg";
+import { IconWallet, IconEdit, IconTrash } from "../components/Icons";
 import { cat } from "../constants";
 import { todayStr, fmtAmt, ls, lsSet } from "../utils";
 
@@ -10,6 +11,7 @@ export default function HomeScreen({ expenses, settings, theme, isDark, t, lang,
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
     window.navigator.standalone === true;
   const [iosDismissed, setIosDismissed] = useState(() => ls('iosHintDismissed', false));
+  const [expandedId, setExpandedId] = useState(null);
   const fmt = (n) => fmtAmt(n, curr.symbol, lang);
   const catColor = (id) => isDark ? cat(id).colorDark : cat(id).colorLight;
 
@@ -30,6 +32,11 @@ export default function HomeScreen({ expenses, settings, theme, isDark, t, lang,
   const todayCats = Object.entries(
     todayExp.reduce((acc, e) => { acc[e.category] = (acc[e.category] || 0) + Number(e.amount); return acc; }, {})
   );
+
+  // Budget ring SVG values
+  const ringR = 28;
+  const ringC = 2 * Math.PI * ringR;
+  const ringOffset = ringC * (1 - budgetPct / 100);
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
@@ -96,35 +103,71 @@ export default function HomeScreen({ expenses, settings, theme, isDark, t, lang,
           </div>
         )}
 
-        {/* Wallet card */}
-        <GlassCard theme={theme} style={{ padding: "16px 18px", marginBottom: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 8 }}>
-            💰 {t.walletBalance}
-          </div>
-          <div style={{
-            fontSize: 28, fontWeight: 900,
-            color: walletBalance >= 0 ? theme.accent1 : "#ef4444",
-            lineHeight: 1.1,
-          }}>
-            {fmt(walletBalance)}
-          </div>
-          {budget > 0 && (
-            <div style={{ marginTop: 12 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 600, marginBottom: 6 }}>
-                <span style={{ color: theme.textSub }}>{t.monthlyBudget}: {fmt(budget)}</span>
-                <span style={{ color: budgetRemaining >= 0 ? theme.accent1 : "#ef4444", fontWeight: 700 }}>
-                  {budgetRemaining >= 0 ? t.remaining : t.overBudget}: {fmt(Math.abs(budgetRemaining))}
-                </span>
-              </div>
-              <div style={{ height: 6, borderRadius: 3, background: theme.divider, overflow: "hidden" }}>
-                <div style={{
-                  height: "100%", borderRadius: 3,
-                  background: budgetRemaining >= 0 ? theme.btnGrad : "linear-gradient(90deg, #ef4444, #f97316)",
-                  width: `${budgetPct}%`, transition: "width 0.4s",
-                }} />
-              </div>
+        {/* Premium Wallet Card */}
+        <GlassCard theme={theme} variant="wallet" style={{ padding: 0, marginBottom: 16, overflow: "hidden" }}>
+          {/* Gradient accent stripe */}
+          <div style={{ height: 3, background: theme.walletAccent }} />
+
+          <div style={{ padding: "16px 20px 18px" }}>
+            {/* Wallet header */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <IconWallet size={16} color={theme.textMuted} />
+              <span style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase" }}>
+                {t.walletBalance}
+              </span>
             </div>
-          )}
+
+            {/* Balance + budget ring row */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <div style={{
+                  fontSize: 34, fontWeight: 900, lineHeight: 1.1,
+                  color: walletBalance >= 0 ? theme.accent1 : "#ef4444",
+                }}>
+                  {fmt(walletBalance)}
+                </div>
+                {budget > 0 && (
+                  <div style={{ display: "flex", gap: 12, marginTop: 10, fontSize: 11, fontWeight: 600 }}>
+                    <span style={{ color: theme.textSub }}>{t.monthlyBudget}: {fmt(budget)}</span>
+                    <span style={{ color: budgetRemaining >= 0 ? theme.accent1 : "#ef4444", fontWeight: 700 }}>
+                      {budgetRemaining >= 0 ? t.remaining : t.overBudget}: {fmt(Math.abs(budgetRemaining))}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Circular budget ring */}
+              {budget > 0 && (
+                <div style={{ position: "relative", width: 64, height: 64, flexShrink: 0 }}>
+                  <svg width={64} height={64} viewBox="0 0 64 64">
+                    <circle cx={32} cy={32} r={ringR} fill="none" stroke={theme.progressRing.track} strokeWidth={5} />
+                    <circle cx={32} cy={32} r={ringR} fill="none"
+                      stroke="url(#budgetGrad)" strokeWidth={5}
+                      strokeLinecap="round"
+                      strokeDasharray={ringC}
+                      strokeDashoffset={ringOffset}
+                      transform="rotate(-90 32 32)"
+                      style={{ transition: "stroke-dashoffset 0.8s ease" }}
+                    />
+                    <defs>
+                      <linearGradient id="budgetGrad" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor={budgetRemaining >= 0 ? theme.progressRing.g1 : "#ef4444"} />
+                        <stop offset="100%" stopColor={budgetRemaining >= 0 ? theme.progressRing.g2 : "#f97316"} />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div style={{
+                    position: "absolute", inset: 0,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 12, fontWeight: 800,
+                    color: budgetRemaining >= 0 ? theme.accent1 : "#ef4444",
+                  }}>
+                    {Math.round(budgetPct)}%
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </GlassCard>
 
         {/* Today's total */}
@@ -170,56 +213,93 @@ export default function HomeScreen({ expenses, settings, theme, isDark, t, lang,
       <div style={{ flex: 1, overflowY: "auto", padding: "0 16px", paddingBottom: 100, position: "relative", zIndex: 1 }}>
         {todayExp.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px 24px", color: theme.textMuted }}>
-            <div style={{ fontSize: 52, marginBottom: 16 }}>💸</div>
-            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6, color: theme.textSub }}>{t.noTransactions}</div>
+            <div style={{
+              width: 80, height: 80, borderRadius: 24,
+              background: theme.glass,
+              border: `1px solid ${theme.glassBorder}`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              margin: "0 auto 20px", fontSize: 36,
+            }}>
+              💸
+            </div>
+            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 6, color: theme.textSub }}>{t.noTransactions}</div>
             <div style={{ fontSize: 13 }}>{t.noTransactionsHint}</div>
           </div>
         ) : todayExp.map(exp => {
           const c = cat(exp.category);
           const color = catColor(exp.category);
+          const isExpanded = expandedId === exp.id;
+          const borderSide = lang === "ar" ? "borderRight" : "borderLeft";
           return (
-            <GlassCard key={exp.id} theme={theme} style={{
-              display: "flex", alignItems: "center", gap: 12,
+            <GlassCard key={exp.id} theme={theme} onClick={() => setExpandedId(isExpanded ? null : exp.id)} style={{
               padding: "13px 14px", marginBottom: 8,
+              cursor: "pointer",
+              [borderSide]: `3px solid ${color}`,
+              transition: "transform 0.15s ease",
             }}>
-              <div style={{
-                width: 42, height: 42, borderRadius: 13, flexShrink: 0,
-                background: c.bg + (isDark ? "0.18)" : "0.14)"),
-                border: `1px solid ${c.bg + (isDark ? "0.30)" : "0.22)")}`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 20,
-              }}>{c.emoji}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{
+                  width: 42, height: 42, borderRadius: 13, flexShrink: 0,
+                  background: c.bg + (isDark ? "0.18)" : "0.14)"),
+                  border: `1px solid ${c.bg + (isDark ? "0.30)" : "0.22)")}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 20,
+                }}>{c.emoji}</div>
 
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 700, fontSize: 14, color: theme.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {exp.note || t.cats[exp.category]}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: theme.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {exp.note || t.cats[exp.category]}
+                  </div>
+                  <div style={{ fontSize: 11, color: theme.textSub, marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
+                    {t.cats[exp.category]}
+                    {exp.subcategory && (
+                      <span style={{
+                        fontSize: 10, color: catColor(exp.category), fontWeight: 600,
+                        background: c.bg + (isDark ? "0.12)" : "0.10)"),
+                        borderRadius: 6, padding: "1px 6px",
+                      }}>{exp.subcategory}</span>
+                    )}
+                  </div>
                 </div>
-                <div style={{ fontSize: 11, color: theme.textSub, marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
-                  {t.cats[exp.category]}
-                  {exp.subcategory && (
-                    <span style={{
-                      fontSize: 10, color: catColor(exp.category), fontWeight: 600,
-                      background: c.bg + (isDark ? "0.12)" : "0.10)"),
-                      borderRadius: 6, padding: "1px 6px",
-                    }}>{exp.subcategory}</span>
-                  )}
+
+                <div style={{ textAlign: lang === "ar" ? "left" : "right", flexShrink: 0 }}>
+                  <div style={{ fontWeight: 800, fontSize: 15, color }}>{fmt(exp.amount)}</div>
                 </div>
               </div>
 
-              <div style={{ textAlign: lang === "ar" ? "left" : "right", flexShrink: 0 }}>
-                <div style={{ fontWeight: 800, fontSize: 15, color }}>{fmt(exp.amount)}</div>
-                <div style={{ display: "flex", gap: 5, marginTop: 5, justifyContent: lang === "ar" ? "flex-start" : "flex-end" }}>
-                  <button onClick={() => onEdit(exp)} style={{
+              {/* Expandable action row */}
+              <div style={{
+                maxHeight: isExpanded ? 48 : 0,
+                opacity: isExpanded ? 1 : 0,
+                overflow: "hidden",
+                transition: "max-height 0.25s ease, opacity 0.2s ease",
+              }}>
+                <div style={{
+                  display: "flex", gap: 8,
+                  justifyContent: lang === "ar" ? "flex-start" : "flex-end",
+                  paddingTop: 10,
+                }}>
+                  <button onClick={(e) => { e.stopPropagation(); onEdit(exp); }} style={{
                     background: theme.glassBg2, border: `1px solid ${theme.glassBorder}`,
-                    borderRadius: 7, color: theme.textSub, fontSize: 11,
-                    padding: "3px 8px", cursor: "pointer",
-                  }}>✏️</button>
-                  <button onClick={() => onDelete(exp.id)} style={{
+                    borderRadius: 10, color: theme.textSub, fontSize: 12,
+                    padding: "6px 14px", cursor: "pointer",
+                    display: "flex", alignItems: "center", gap: 5, fontWeight: 600,
+                    fontFamily: "inherit",
+                  }}>
+                    <IconEdit size={14} color={theme.textSub} />
+                    {lang === "ar" ? "تعديل" : "Edit"}
+                  </button>
+                  <button onClick={(e) => { e.stopPropagation(); onDelete(exp.id); }} style={{
                     background: isDark ? "rgba(239,68,68,0.12)" : "rgba(239,68,68,0.08)",
                     border: "1px solid rgba(239,68,68,0.25)",
-                    borderRadius: 7, color: "#ef4444", fontSize: 11,
-                    padding: "3px 8px", cursor: "pointer",
-                  }}>🗑️</button>
+                    borderRadius: 10, color: "#ef4444", fontSize: 12,
+                    padding: "6px 14px", cursor: "pointer",
+                    display: "flex", alignItems: "center", gap: 5, fontWeight: 600,
+                    fontFamily: "inherit",
+                  }}>
+                    <IconTrash size={14} color="#ef4444" />
+                    {lang === "ar" ? "حذف" : "Delete"}
+                  </button>
                 </div>
               </div>
             </GlassCard>

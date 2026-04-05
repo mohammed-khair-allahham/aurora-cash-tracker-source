@@ -1,6 +1,7 @@
 import { useState } from "react";
 import GlassCard from "../components/GlassCard";
 import GlowBg from "../components/GlowBg";
+import { IconChevronLeft, IconChevronRight } from "../components/Icons";
 import { CATEGORIES, cat } from "../constants";
 import { todayStr } from "../utils";
 
@@ -11,6 +12,7 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
   const [note,        setNote]        = useState(editing?.note || "");
   const [date,        setDate]        = useState(editing?.date || todayStr());
   const [newSubInput, setNewSubInput] = useState("");
+  const [amountFocused, setAmountFocused] = useState(false);
 
   const valid = amount && !isNaN(Number(amount)) && Number(amount) > 0;
   const selColor = isDark ? cat(category).colorDark : cat(category).colorLight;
@@ -41,6 +43,8 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
     transition: "border-color 0.2s",
   };
 
+  const BackIcon = lang === "ar" ? IconChevronRight : IconChevronLeft;
+
   return (
     <div style={{ height: "100%", overflowY: "auto", position: "relative" }}>
       <GlowBg theme={theme} />
@@ -50,10 +54,11 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
           <button onClick={onCancel} style={{
             background: theme.glass, border: `1px solid ${theme.glassBorder}`,
-            borderRadius: 12, color: theme.text, padding: "9px 14px",
-            cursor: "pointer", fontSize: 16, backdropFilter: "blur(12px)",
+            borderRadius: 12, color: theme.text, padding: "9px 12px",
+            cursor: "pointer", backdropFilter: "blur(12px)",
+            display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            {lang === "ar" ? "→" : "←"}
+            <BackIcon size={18} color={theme.text} />
           </button>
           <h2 style={{ margin: 0, fontWeight: 800, fontSize: 22, color: theme.text }}>
             {editing ? t.editExpense : t.addExpense}
@@ -61,7 +66,7 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
         </div>
 
         {/* Amount */}
-        <GlassCard theme={theme} style={{ padding: "22px 20px", marginBottom: 18, textAlign: "center" }}>
+        <GlassCard theme={theme} variant="elevated" style={{ padding: "22px 20px", marginBottom: 18, textAlign: "center" }}>
           <div style={{ fontSize: 12, fontWeight: 600, color: theme.textSub, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10 }}>
             {t.amount} · {curr.code}
           </div>
@@ -70,6 +75,8 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
             <input
               type="number" value={amount}
               onChange={e => setAmount(e.target.value)}
+              onFocus={() => setAmountFocused(true)}
+              onBlur={() => setAmountFocused(false)}
               placeholder="0"
               style={{
                 background: "none", border: "none", outline: "none",
@@ -80,6 +87,14 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
               }}
             />
           </div>
+          {/* Animated focus underline */}
+          <div style={{
+            height: 2, borderRadius: 1,
+            background: amountFocused ? theme.walletAccent : "transparent",
+            width: amountFocused ? "60%" : "0%",
+            margin: "8px auto 0",
+            transition: "background 0.3s, width 0.3s ease-out",
+          }} />
         </GlassCard>
 
         {/* Category grid */}
@@ -95,11 +110,13 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
                 <button key={c.id} onClick={() => handleCategoryChange(c.id)} style={{
                   background: active ? c.bg + (isDark ? "0.20)" : "0.15)") : theme.glass,
                   border: active ? `1.5px solid ${color}` : `1px solid ${theme.glassBorder}`,
-                  borderRadius: 14, padding: "12px 4px",
+                  borderRadius: 18, padding: "12px 4px",
                   cursor: "pointer", display: "flex", flexDirection: "column",
                   alignItems: "center", gap: 5,
                   backdropFilter: "blur(12px)",
-                  transition: "all 0.15s",
+                  transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                  transform: active ? "scale(1.05)" : "scale(1)",
+                  boxShadow: active ? `0 0 16px ${c.bg}0.25)` : "none",
                 }}>
                   <span style={{ fontSize: 22 }}>{c.emoji}</span>
                   <span style={{ fontSize: 10, color: active ? color : theme.textSub, fontWeight: 600 }}>{t.cats[c.id]}</span>
@@ -125,7 +142,9 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
                     borderRadius: 20, padding: "6px 14px",
                     cursor: "pointer", fontSize: 12, fontWeight: 600,
                     color: active ? selColor : theme.textSub,
-                    backdropFilter: "blur(12px)", transition: "all 0.15s",
+                    backdropFilter: "blur(12px)",
+                    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                    transform: active ? "scale(1.03)" : "scale(1)",
                   }}>
                     {sub}
                   </button>
@@ -172,6 +191,8 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
           style={{
             width: "100%", padding: "17px",
             background: valid ? theme.btnGrad : theme.glass,
+            backgroundSize: valid ? "200% 100%" : undefined,
+            animation: valid ? "shimmer 3s ease-in-out infinite" : "none",
             border: valid ? "none" : `1px solid ${theme.glassBorder}`,
             borderRadius: 18,
             color: valid ? "#fff" : theme.textMuted,

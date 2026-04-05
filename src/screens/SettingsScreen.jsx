@@ -1,12 +1,18 @@
 import { useState } from "react";
 import GlassCard from "../components/GlassCard";
 import GlowBg from "../components/GlowBg";
+import { IconSettings, IconGlobe, IconMoon, IconSun, IconCoin, IconWallet, IconBell, IconTrash } from "../components/Icons";
 import { CURRENCIES } from "../constants";
 
-function Section({ title, children, theme }) {
+function Section({ title, icon, children, theme }) {
   return (
     <div style={{ marginBottom: 22 }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10 }}>
+      <div style={{
+        fontSize: 11, fontWeight: 700, color: theme.textMuted,
+        letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10,
+        display: "flex", alignItems: "center", gap: 6,
+      }}>
+        {icon}
         {title}
       </div>
       {children}
@@ -14,25 +20,26 @@ function Section({ title, children, theme }) {
   );
 }
 
-function ToggleGroup({ options, value, onChange, theme, isDark }) {
+function ToggleGroup({ options, value, onChange, theme }) {
   return (
     <div style={{ display: "flex", gap: 8 }}>
-      {options.map(opt => (
-        <button key={opt.value} onClick={() => onChange(opt.value)} style={{
-          flex: 1, padding: "12px 8px",
-          background: value === opt.value
-            ? (isDark ? "rgba(56,189,248,0.15)" : "rgba(3,105,161,0.10)")
-            : theme.glass,
-          border: value === opt.value
-            ? `1.5px solid ${isDark ? "#38bdf8" : "#0369a1"}`
-            : `1px solid ${theme.glassBorder}`,
-          borderRadius: 12, cursor: "pointer",
-          color: value === opt.value ? (isDark ? "#38bdf8" : "#0369a1") : theme.textSub,
-          fontFamily: "inherit", fontWeight: 700, fontSize: 14,
-          backdropFilter: "blur(12px)",
-          transition: "all 0.2s",
-        }}>{opt.label}</button>
-      ))}
+      {options.map(opt => {
+        const active = value === opt.value;
+        return (
+          <button key={opt.value} onClick={() => onChange(opt.value)} style={{
+            flex: 1, padding: "12px 8px",
+            background: active ? theme.btnGrad : theme.glass,
+            border: active ? "none" : `1px solid ${theme.glassBorder}`,
+            borderRadius: 24, cursor: "pointer",
+            color: active ? "#fff" : theme.textSub,
+            fontFamily: "inherit", fontWeight: 700, fontSize: 14,
+            backdropFilter: "blur(12px)",
+            transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+            transform: active ? "scale(1.02)" : "scale(1)",
+            boxShadow: active ? "0 4px 16px rgba(56,189,248,0.2)" : "none",
+          }}>{opt.label}</button>
+        );
+      })}
     </div>
   );
 }
@@ -49,20 +56,23 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, n
     <div style={{ height: "100%", overflowY: "auto", position: "relative" }}>
       <GlowBg theme={theme} />
       <div style={{ padding: "52px 20px 84px", position: "relative", zIndex: 1 }}>
-        <h2 style={{ margin: "0 0 28px", fontWeight: 900, fontSize: 26, color: theme.text }}>⚙️ {t.settings}</h2>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
+          <IconSettings size={24} color={theme.text} />
+          <h2 style={{ margin: 0, fontWeight: 900, fontSize: 26, color: theme.text }}>{t.settings}</h2>
+        </div>
 
-        <Section title={t.language} theme={theme}>
+        <Section title={t.language} icon={<IconGlobe size={14} color={theme.textMuted} />} theme={theme}>
           <ToggleGroup
-            theme={theme} isDark={isDark}
+            theme={theme}
             options={[{ value: "en", label: "English" }, { value: "ar", label: "العربية" }]}
             value={settings.lang}
             onChange={v => set("lang", v)}
           />
         </Section>
 
-        <Section title={t.theme} theme={theme}>
+        <Section title={t.theme} icon={isDark ? <IconMoon size={14} color={theme.textMuted} /> : <IconSun size={14} color={theme.textMuted} />} theme={theme}>
           <ToggleGroup
-            theme={theme} isDark={isDark}
+            theme={theme}
             options={[
               { value: "dark",  label: `🌙 ${t.dark}` },
               { value: "light", label: `☀️ ${t.light}` },
@@ -72,17 +82,17 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, n
           />
         </Section>
 
-        <Section title={t.currency} theme={theme}>
+        <Section title={t.currency} icon={<IconCoin size={14} color={theme.textMuted} />} theme={theme}>
           <ToggleGroup
-            theme={theme} isDark={isDark}
+            theme={theme}
             options={CURRENCIES.map(c => ({ value: c.code, label: `${c.symbol} ${c.code}` }))}
             value={settings.currency}
             onChange={v => set("currency", v)}
           />
         </Section>
 
-        <Section title={`💰 ${t.wallet}`} theme={theme}>
-          <GlassCard theme={theme} style={{ padding: "14px 16px" }}>
+        <Section title={t.wallet} icon={<IconWallet size={14} color={theme.textMuted} />} theme={theme}>
+          <GlassCard theme={theme} variant="elevated" style={{ padding: "14px 16px" }}>
             <div style={{ marginBottom: 14 }}>
               <div style={{ fontSize: 12, fontWeight: 600, color: theme.textSub, marginBottom: 8 }}>{t.walletBalance}</div>
               <input
@@ -122,7 +132,7 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, n
           </GlassCard>
         </Section>
 
-        <Section title={t.reminderTime} theme={theme}>
+        <Section title={t.reminderTime} icon={<IconBell size={14} color={theme.textMuted} />} theme={theme}>
           <GlassCard theme={theme} style={{ padding: "4px 4px" }}>
             {notif ? (
               <div style={{ padding: "10px 14px" }}>
@@ -153,7 +163,7 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, n
                   fontWeight: 700, fontFamily: "inherit",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                 }}>
-                  <span>🔔</span> {t.enableNotif}
+                  <IconBell size={16} color={isDark ? "#fbbf24" : "#d97706"} /> {t.enableNotif}
                 </button>
                 {isIOS && !isStandalone && (
                   <div style={{ fontSize: 11, color: theme.textMuted, textAlign: "center", padding: "0 12px 10px" }}>
@@ -165,7 +175,7 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, n
           </GlassCard>
         </Section>
 
-        <Section title={t.clearData} theme={theme}>
+        <Section title={t.clearData} icon={<IconTrash size={14} color={theme.textMuted} />} theme={theme}>
           {!confirmClear ? (
             <button onClick={() => setConfirmClear(true)} style={{
               width: "100%", padding: "14px",
@@ -173,8 +183,9 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, n
               border: "1px solid rgba(239,68,68,0.25)",
               borderRadius: 14, color: "#ef4444",
               fontSize: 14, cursor: "pointer", fontWeight: 700, fontFamily: "inherit",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
             }}>
-              🗑️ {t.clearData}
+              <IconTrash size={16} color="#ef4444" /> {t.clearData}
             </button>
           ) : (
             <GlassCard theme={theme} style={{ padding: 16, border: "1px solid rgba(239,68,68,0.3)" }}>

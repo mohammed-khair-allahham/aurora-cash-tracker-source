@@ -3,6 +3,7 @@ import T from "./i18n";
 import { SCREENS, CURRENCIES, DARK, LIGHT } from "./constants";
 import { ls, lsSet } from "./utils";
 import BottomNav from "./components/BottomNav";
+import { IconPlus } from "./components/Icons";
 import HomeScreen from "./screens/HomeScreen";
 import AddScreen from "./screens/AddScreen";
 import ReportsScreen from "./screens/ReportsScreen";
@@ -143,7 +144,28 @@ export default function App() {
         rel="stylesheet"
       />
 
-      <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+      {/* Global keyframes */}
+      <style>{`
+        @keyframes fadeSlideIn {
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fabPulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.06); }
+        }
+        @keyframes shimmer {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+      `}</style>
+
+      {/* Screen content with fade-slide transition */}
+      <div key={screen} style={{
+        flex: 1, overflow: "hidden",
+        display: "flex", flexDirection: "column",
+        animation: "fadeSlideIn 0.25s ease-out",
+      }}>
         {screen === SCREENS.HOME && (
           <HomeScreen
             {...commonProps}
@@ -192,20 +214,24 @@ export default function App() {
         )}
       </div>
 
+      {/* FAB */}
       {screen !== SCREENS.ADD && (
         <button onClick={() => handleNavigate(SCREENS.ADD)} style={{
           position: "fixed",
           bottom: 90,
           right: "max(16px, calc(50vw - 215px + 16px))",
-          width: 56, height: 56, borderRadius: "50%",
+          width: 60, height: 60, borderRadius: "50%",
           background: theme.btnGrad,
-          border: "none", cursor: "pointer",
-          fontSize: 26, color: "#fff", fontWeight: 700,
+          border: "2px solid rgba(255,255,255,0.15)",
+          cursor: "pointer",
           display: "flex", alignItems: "center", justifyContent: "center",
-          boxShadow: `0 4px 24px rgba(56,189,248,${isDark ? "0.4" : "0.3"})`,
+          boxShadow: theme.fabGlow,
           zIndex: 201,
-          transition: "transform 0.2s, box-shadow 0.2s",
-        }}>+</button>
+          animation: "fabPulse 3s ease-in-out infinite",
+          transition: "box-shadow 0.3s",
+        }}>
+          <IconPlus size={26} color="#fff" style={{ strokeWidth: 2.5 }} />
+        </button>
       )}
 
       <BottomNav

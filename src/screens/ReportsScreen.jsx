@@ -2,6 +2,7 @@ import { useState } from "react";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import GlassCard from "../components/GlassCard";
 import GlowBg from "../components/GlowBg";
+import { IconChart, IconChevronLeft, IconChevronRight } from "../components/Icons";
 import { CATEGORIES } from "../constants";
 import { todayStr, fmtAmt, getDaysInMonth, getMondayStr, fmtShortDate } from "../utils";
 
@@ -51,26 +52,32 @@ export default function ReportsScreen({ expenses, settings, theme, isDark, t, la
   const prevMonth = () => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); };
   const nextMonth = () => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); };
 
+  const PrevIcon = lang === "ar" ? IconChevronRight : IconChevronLeft;
+  const NextIcon = lang === "ar" ? IconChevronLeft : IconChevronRight;
+
   return (
     <div style={{ height: "100%", overflowY: "auto", position: "relative" }}>
       <GlowBg theme={theme} />
       <div style={{ padding: "52px 20px 84px", position: "relative", zIndex: 1 }}>
-        <h2 style={{ margin: "0 0 22px", fontWeight: 900, fontSize: 26, color: theme.text }}>📊 {t.reports}</h2>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 22 }}>
+          <IconChart size={24} color={theme.text} />
+          <h2 style={{ margin: 0, fontWeight: 900, fontSize: 26, color: theme.text }}>{t.reports}</h2>
+        </div>
 
         {/* Month navigator */}
         <GlassCard theme={theme} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 18px", marginBottom: 18 }}>
-          <button onClick={prevMonth} style={{ background: "none", border: "none", color: theme.text, fontSize: 22, cursor: "pointer", padding: "0 6px" }}>
-            {lang === "ar" ? "›" : "‹"}
+          <button onClick={prevMonth} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px", display: "flex" }}>
+            <PrevIcon size={20} color={theme.text} />
           </button>
           <div style={{ fontWeight: 800, fontSize: 17, color: theme.text }}>{t.months[month]} {year}</div>
-          <button onClick={nextMonth} style={{ background: "none", border: "none", color: theme.text, fontSize: 22, cursor: "pointer", padding: "0 6px" }}>
-            {lang === "ar" ? "‹" : "›"}
+          <button onClick={nextMonth} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px", display: "flex" }}>
+            <NextIcon size={20} color={theme.text} />
           </button>
         </GlassCard>
 
         {/* Summary cards */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 18 }}>
-          <GlassCard theme={theme} style={{ padding: "16px 18px" }}>
+          <GlassCard theme={theme} variant="elevated" style={{ padding: "16px 18px" }}>
             <div style={{ fontSize: 11, color: theme.textSub, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>{t.monthlyTotal}</div>
             <div style={{ fontSize: 22, fontWeight: 900, background: theme.totalGrad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{fmt(monthTotal)}</div>
             <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4 }}>{monthExp.length} {t.transactions}</div>
@@ -83,7 +90,7 @@ export default function ReportsScreen({ expenses, settings, theme, isDark, t, la
               );
             })()}
           </GlassCard>
-          <GlassCard theme={theme} style={{ padding: "16px 18px" }}>
+          <GlassCard theme={theme} variant="elevated" style={{ padding: "16px 18px" }}>
             <div style={{ fontSize: 11, color: theme.textSub, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>{t.thisWeek}</div>
             <div style={{ fontSize: 22, fontWeight: 900, color: isDark ? "#fbbf24" : "#d97706" }}>{fmt(weekTotal)}</div>
             <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4 }}>
@@ -96,17 +103,27 @@ export default function ReportsScreen({ expenses, settings, theme, isDark, t, la
         {catData.length > 0 && (
           <GlassCard theme={theme} style={{ padding: "18px", marginBottom: 18 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 14 }}>{t.byCategory}</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <PieChart width={130} height={130}>
-                <Pie data={catData} cx={60} cy={60} innerRadius={38} outerRadius={60} dataKey="value" strokeWidth={0}>
-                  {catData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                </Pie>
-              </PieChart>
-              <div style={{ flex: 1 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              {/* Larger pie chart with center total */}
+              <div style={{ position: "relative", width: 180, height: 180, flexShrink: 0 }}>
+                <PieChart width={180} height={180}>
+                  <Pie data={catData} cx={85} cy={85} innerRadius={52} outerRadius={80} dataKey="value" strokeWidth={0}>
+                    {catData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                  </Pie>
+                </PieChart>
+                <div style={{
+                  position: "absolute", top: "50%", left: "50%",
+                  transform: "translate(-50%, -50%)", textAlign: "center",
+                }}>
+                  <div style={{ fontSize: 10, color: theme.textMuted, fontWeight: 600, textTransform: "uppercase" }}>{t.spent}</div>
+                  <div style={{ fontSize: 15, fontWeight: 900, color: theme.text }}>{fmt(monthTotal)}</div>
+                </div>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 {catData.slice(0, 5).map(c => (
-                  <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 7 }}>
+                  <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 8 }}>
                     <div style={{ width: 8, height: 8, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
-                    <span style={{ fontSize: 12, fontWeight: 600, flex: 1, color: theme.text }}>{c.emoji} {t.cats[c.id]}</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, flex: 1, color: theme.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.emoji} {t.cats[c.id]}</span>
                     <span style={{ fontSize: 11, fontWeight: 800, color: c.color }}>{fmt(c.value)}</span>
                   </div>
                 ))}
@@ -119,12 +136,18 @@ export default function ReportsScreen({ expenses, settings, theme, isDark, t, la
         <GlassCard theme={theme} style={{ padding: "18px", marginBottom: 18 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 14 }}>{t.dailyBreakdown}</div>
           {dailyData.some(d => d.total > 0) ? (
-            <ResponsiveContainer width="100%" height={140}>
-              <BarChart data={dailyData} barSize={6}>
+            <ResponsiveContainer width="100%" height={180}>
+              <BarChart data={dailyData} barSize={7}>
+                <defs>
+                  <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={isDark ? "#38bdf8" : "#0ea5e9"} stopOpacity={1} />
+                    <stop offset="100%" stopColor={isDark ? "#818cf8" : "#4f46e5"} stopOpacity={0.6} />
+                  </linearGradient>
+                </defs>
                 <XAxis dataKey="day" tick={{ fill: theme.textMuted, fontSize: 9 }} tickLine={false} axisLine={false} interval={6} />
                 <YAxis hide />
                 <Tooltip content={<ChartTooltip theme={theme} fmt={fmt} />} />
-                <Bar dataKey="total" radius={[3, 3, 0, 0]} fill={isDark ? "#38bdf8" : "#0ea5e9"} opacity={0.85} />
+                <Bar dataKey="total" radius={[4, 4, 0, 0]} fill="url(#barGradient)" />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -136,14 +159,25 @@ export default function ReportsScreen({ expenses, settings, theme, isDark, t, la
         {dailyData.filter(d => d.total > 0).length > 0 && (
           <GlassCard theme={theme} style={{ padding: "18px" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 14 }}>{t.topDays}</div>
-            {[...dailyData].filter(d => d.total > 0).sort((a, b) => b.total - a.total).slice(0, 5).map(d => (
+            {[...dailyData].filter(d => d.total > 0).sort((a, b) => b.total - a.total).slice(0, 5).map((d, i) => (
               <div key={d.day} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: theme.text, minWidth: 70 }}>
+                {/* Rank badge */}
+                <div style={{
+                  width: 24, height: 24, borderRadius: "50%",
+                  background: i === 0 ? theme.btnGrad : theme.glass,
+                  border: i > 0 ? `1px solid ${theme.glassBorder}` : "none",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 11, fontWeight: 800, flexShrink: 0,
+                  color: i === 0 ? "#fff" : theme.textSub,
+                }}>
+                  {i + 1}
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: theme.text, minWidth: 60 }}>
                   {t.months[month]} {d.day}
                 </div>
-                <div style={{ flex: 1, height: 5, borderRadius: 3, background: theme.divider, overflow: "hidden" }}>
+                <div style={{ flex: 1, height: 8, borderRadius: 4, background: theme.divider, overflow: "hidden" }}>
                   <div style={{
-                    height: "100%", borderRadius: 3,
+                    height: "100%", borderRadius: 4,
                     background: `linear-gradient(90deg, ${isDark ? "#38bdf8" : "#0ea5e9"}, ${isDark ? "#818cf8" : "#4f46e5"})`,
                     width: `${(d.total / maxDay) * 100}%`,
                     transition: "width 0.4s",
