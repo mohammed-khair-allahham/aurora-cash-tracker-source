@@ -14,7 +14,7 @@ export const CURRENCIES = [
   { code: "USD", symbol: "$",   name: "US Dollar" },
 ];
 
-export const SCREENS = { HOME: "home", ADD: "add", REPORTS: "reports", SETTINGS: "settings" };
+export const SCREENS = { HOME: "home", ADD: "add", ALL: "all", REPORTS: "reports", SETTINGS: "settings" };
 
 export const DARK = {
   bg:          "linear-gradient(170deg, #020d1c 0%, #030f20 55%, #010b16 100%)",

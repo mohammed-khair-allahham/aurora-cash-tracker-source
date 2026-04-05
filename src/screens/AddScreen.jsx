@@ -4,14 +4,32 @@ import GlowBg from "../components/GlowBg";
 import { CATEGORIES, cat } from "../constants";
 import { todayStr } from "../utils";
 
-export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSave, onCancel }) {
-  const [amount,   setAmount]   = useState(editing?.amount?.toString() || "");
-  const [category, setCategory] = useState(editing?.category || "food");
-  const [note,     setNote]     = useState(editing?.note || "");
-  const [date,     setDate]     = useState(editing?.date || todayStr());
+export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSave, onCancel, subcategories, onAddSubcategory }) {
+  const [amount,      setAmount]      = useState(editing?.amount?.toString() || "");
+  const [category,    setCategory]    = useState(editing?.category || "food");
+  const [subcategory, setSubcategory] = useState(editing?.subcategory || "");
+  const [note,        setNote]        = useState(editing?.note || "");
+  const [date,        setDate]        = useState(editing?.date || todayStr());
+  const [newSubInput, setNewSubInput] = useState("");
 
   const valid = amount && !isNaN(Number(amount)) && Number(amount) > 0;
   const selColor = isDark ? cat(category).colorDark : cat(category).colorLight;
+  const catSubs = subcategories[category] || [];
+
+  const handleCategoryChange = (catId) => {
+    setCategory(catId);
+    if (subcategory && !(subcategories[catId] || []).includes(subcategory)) {
+      setSubcategory("");
+    }
+  };
+
+  const handleAddSub = () => {
+    const trimmed = newSubInput.trim();
+    if (!trimmed) return;
+    onAddSubcategory(category, trimmed);
+    setSubcategory(trimmed);
+    setNewSubInput("");
+  };
 
   const inputStyle = {
     width: "100%", boxSizing: "border-box",
@@ -74,7 +92,7 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
               const color = isDark ? c.colorDark : c.colorLight;
               const active = category === c.id;
               return (
-                <button key={c.id} onClick={() => setCategory(c.id)} style={{
+                <button key={c.id} onClick={() => handleCategoryChange(c.id)} style={{
                   background: active ? c.bg + (isDark ? "0.20)" : "0.15)") : theme.glass,
                   border: active ? `1.5px solid ${color}` : `1px solid ${theme.glassBorder}`,
                   borderRadius: 14, padding: "12px 4px",
@@ -88,6 +106,46 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
                 </button>
               );
             })}
+          </div>
+        </div>
+
+        {/* Subcategory */}
+        <div style={{ marginBottom: 18 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10 }}>
+            {t.subcategory}
+          </div>
+          {catSubs.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
+              {catSubs.map(sub => {
+                const active = subcategory === sub;
+                return (
+                  <button key={sub} onClick={() => setSubcategory(active ? "" : sub)} style={{
+                    background: active ? cat(category).bg + (isDark ? "0.20)" : "0.15)") : theme.glass,
+                    border: active ? `1.5px solid ${selColor}` : `1px solid ${theme.glassBorder}`,
+                    borderRadius: 20, padding: "6px 14px",
+                    cursor: "pointer", fontSize: 12, fontWeight: 600,
+                    color: active ? selColor : theme.textSub,
+                    backdropFilter: "blur(12px)", transition: "all 0.15s",
+                  }}>
+                    {sub}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 8 }}>
+            <input
+              value={newSubInput}
+              onChange={e => setNewSubInput(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter") handleAddSub(); }}
+              placeholder={t.addSubcategory}
+              style={{ ...inputStyle, flex: 1 }}
+            />
+            <button onClick={handleAddSub} style={{
+              background: theme.btnGrad, border: "none", borderRadius: 14,
+              padding: "0 16px", color: "#fff", fontWeight: 700, fontSize: 18,
+              cursor: "pointer", flexShrink: 0,
+            }}>+</button>
           </div>
         </div>
 
@@ -110,7 +168,7 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
 
         {/* Submit */}
         <button
-          onClick={() => valid && onSave({ amount: Number(amount), category, note, date })}
+          onClick={() => valid && onSave({ amount: Number(amount), category, subcategory: subcategory || undefined, note, date })}
           style={{
             width: "100%", padding: "17px",
             background: valid ? theme.btnGrad : theme.glass,

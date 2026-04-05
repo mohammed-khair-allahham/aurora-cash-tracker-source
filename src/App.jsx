@@ -6,6 +6,7 @@ import BottomNav from "./components/BottomNav";
 import HomeScreen from "./screens/HomeScreen";
 import AddScreen from "./screens/AddScreen";
 import ReportsScreen from "./screens/ReportsScreen";
+import AllScreen from "./screens/AllScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 
 export default function App() {
@@ -18,6 +19,7 @@ export default function App() {
     ...ls("ct_settings", {}),
   }));
   const [editingId, setEditingId] = useState(null);
+  const [subcategories, setSubcategories] = useState(() => ls("ct_subcategories", {}));
   const [notif,     setNotif]     = useState(
     typeof Notification !== "undefined" && Notification.permission === "granted"
   );
@@ -30,6 +32,7 @@ export default function App() {
 
   useEffect(() => { lsSet("ct_expenses", expenses); }, [expenses]);
   useEffect(() => { lsSet("ct_settings", settings); }, [settings]);
+  useEffect(() => { lsSet("ct_subcategories", subcategories); }, [subcategories]);
 
   const notifTimerRef = useRef(null);
   useEffect(() => {
@@ -74,6 +77,16 @@ export default function App() {
         new Notification("💰 " + t.appName, { body: t.reminderHint });
       }
     }
+  };
+
+  const addSubcategory = (categoryId, name) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    setSubcategories(prev => {
+      const list = prev[categoryId] || [];
+      if (list.includes(trimmed)) return prev;
+      return { ...prev, [categoryId]: [...list, trimmed] };
+    });
   };
 
   const saveExpense = (exp) => {
@@ -139,6 +152,16 @@ export default function App() {
             editing={editingExp}
             onSave={saveExpense}
             onCancel={() => { setEditingId(null); setScreen(SCREENS.HOME); }}
+            subcategories={subcategories}
+            onAddSubcategory={addSubcategory}
+          />
+        )}
+        {screen === SCREENS.ALL && (
+          <AllScreen
+            {...commonProps}
+            expenses={expenses}
+            onEdit={startEdit}
+            onDelete={deleteExpense}
           />
         )}
         {screen === SCREENS.REPORTS && (
@@ -158,6 +181,22 @@ export default function App() {
           />
         )}
       </div>
+
+      {screen !== SCREENS.ADD && (
+        <button onClick={() => handleNavigate(SCREENS.ADD)} style={{
+          position: "fixed",
+          bottom: 90,
+          right: "max(16px, calc(50vw - 215px + 16px))",
+          width: 56, height: 56, borderRadius: "50%",
+          background: theme.btnGrad,
+          border: "none", cursor: "pointer",
+          fontSize: 26, color: "#fff", fontWeight: 700,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: `0 4px 24px rgba(56,189,248,${isDark ? "0.4" : "0.3"})`,
+          zIndex: 201,
+          transition: "transform 0.2s, box-shadow 0.2s",
+        }}>+</button>
+      )}
 
       <BottomNav
         screen={screen}

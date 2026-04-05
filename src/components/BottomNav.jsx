@@ -3,7 +3,7 @@ import { SCREENS } from "../constants";
 export default function BottomNav({ screen, onNavigate, theme, isDark, t }) {
   const navItems = [
     { id: SCREENS.HOME,     emoji: "🏠", label: t.home },
-    { id: SCREENS.ADD,      emoji: "＋", label: t.addExpense, big: true },
+    { id: SCREENS.ALL,      emoji: "📋", label: t.all },
     { id: SCREENS.REPORTS,  emoji: "📊", label: t.reports },
     { id: SCREENS.SETTINGS, emoji: "⚙️", label: t.settings },
   ];
@@ -22,18 +22,7 @@ export default function BottomNav({ screen, onNavigate, theme, isDark, t }) {
       zIndex: 200,
       transition: "background 0.4s",
     }}>
-      {navItems.map(nav => nav.big ? (
-        <button key={nav.id} onClick={() => onNavigate(nav.id)} style={{
-          width: 56, height: 56, borderRadius: "50%",
-          background: theme.btnGrad,
-          border: "none", cursor: "pointer",
-          fontSize: 26, display: "flex", alignItems: "center", justifyContent: "center",
-          boxShadow: `0 4px 24px rgba(56,189,248,${isDark ? "0.4" : "0.3"})`,
-          transform: screen === nav.id ? "scale(1.08)" : "scale(1)",
-          transition: "transform 0.2s, box-shadow 0.2s",
-          marginTop: -18, color: "#fff", fontWeight: 700,
-        }}>+</button>
-      ) : (
+      {navItems.map(nav => (
         <button key={nav.id} onClick={() => onNavigate(nav.id)} style={{
           background: "none", border: "none", cursor: "pointer",
           display: "flex", flexDirection: "column", alignItems: "center", gap: 3,

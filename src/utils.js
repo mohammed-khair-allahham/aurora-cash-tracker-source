@@ -31,3 +31,18 @@ export function fmtAmt(n, sym, lang) {
 export function getDaysInMonth(y, m) {
   return new Date(y, m + 1, 0).getDate();
 }
+
+export function getMondayStr() {
+  const d = new Date();
+  const day = d.getDay();
+  const diff = day === 0 ? 6 : day - 1;
+  d.setDate(d.getDate() - diff);
+  return d.toISOString().split("T")[0];
+}
+
+export function fmtShortDate(dateStr, lang, months) {
+  const [, m, d] = dateStr.split("-");
+  return lang === "ar"
+    ? `${parseInt(d)} ${months[parseInt(m) - 1]}`
+    : `${months[parseInt(m) - 1]} ${parseInt(d)}`;
+}

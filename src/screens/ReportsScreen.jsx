@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveCo
 import GlassCard from "../components/GlassCard";
 import GlowBg from "../components/GlowBg";
 import { CATEGORIES } from "../constants";
-import { todayStr, fmtAmt, getDaysInMonth } from "../utils";
+import { todayStr, fmtAmt, getDaysInMonth, getMondayStr, fmtShortDate } from "../utils";
 
 function ChartTooltip({ active, payload, theme, fmt }) {
   if (!active || !payload?.length) return null;
@@ -26,7 +26,10 @@ export default function ReportsScreen({ expenses, theme, isDark, t, lang, curr }
     return d.getMonth() === month && d.getFullYear() === year;
   });
   const monthTotal = monthExp.reduce((s, e) => s + Number(e.amount), 0);
-  const todayTotal = expenses.filter(e => e.date === todayStr()).reduce((s, e) => s + Number(e.amount), 0);
+  const mondayStr = getMondayStr();
+  const todayS = todayStr();
+  const weekExp = expenses.filter(e => e.date >= mondayStr && e.date <= todayS);
+  const weekTotal = weekExp.reduce((s, e) => s + Number(e.amount), 0);
 
   const catData = CATEGORIES.map(c => ({
     ...c,
@@ -73,9 +76,11 @@ export default function ReportsScreen({ expenses, theme, isDark, t, lang, curr }
             <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4 }}>{monthExp.length} {t.transactions}</div>
           </GlassCard>
           <GlassCard theme={theme} style={{ padding: "16px 18px" }}>
-            <div style={{ fontSize: 11, color: theme.textSub, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>{t.today}</div>
-            <div style={{ fontSize: 22, fontWeight: 900, color: isDark ? "#fbbf24" : "#d97706" }}>{fmt(todayTotal)}</div>
-            <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4 }}>{new Date().toLocaleDateString(lang === "ar" ? "ar-SA" : "en-US", { weekday: "long" })}</div>
+            <div style={{ fontSize: 11, color: theme.textSub, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>{t.thisWeek}</div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: isDark ? "#fbbf24" : "#d97706" }}>{fmt(weekTotal)}</div>
+            <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4 }}>
+              {fmtShortDate(mondayStr, lang, t.months)} – {fmtShortDate(todayS, lang, t.months)}
+            </div>
           </GlassCard>
         </div>
 
