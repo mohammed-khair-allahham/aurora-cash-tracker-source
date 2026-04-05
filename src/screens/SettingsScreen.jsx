@@ -1,7 +1,7 @@
 import { useState } from "react";
 import GlassCard from "../components/GlassCard";
 import GlowBg from "../components/GlowBg";
-import { IconSettings, IconGlobe, IconMoon, IconSun, IconCoin, IconWallet, IconBell, IconTrash } from "../components/Icons";
+import { IconSettings, IconGlobe, IconMoon, IconSun, IconCoin, IconWallet, IconBell, IconTrash, IconBook, IconChevronRight, IconChevronLeft } from "../components/Icons";
 import { CURRENCIES } from "../constants";
 
 function Section({ title, icon, children, theme }) {
@@ -44,7 +44,7 @@ function ToggleGroup({ options, value, onChange, theme }) {
   );
 }
 
-export default function SettingsScreen({ settings, onChange, theme, isDark, t, notif, onRequestNotif, onClear }) {
+export default function SettingsScreen({ settings, onChange, theme, isDark, t, lang, notif, onRequestNotif, onClear, onOpenGuide }) {
   const [confirmClear, setConfirmClear] = useState(false);
   const set = (key, val) => onChange(s => ({ ...s, [key]: val }));
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
@@ -91,47 +91,6 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, n
           />
         </Section>
 
-        <Section title={t.wallet} icon={<IconWallet size={14} color={theme.textMuted} />} theme={theme}>
-          <GlassCard theme={theme} variant="elevated" style={{ padding: "14px 16px" }}>
-            <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: theme.textSub, marginBottom: 8 }}>{t.walletBalance}</div>
-              <input
-                type="number"
-                value={settings.walletBalance || ""}
-                onChange={e => set("walletBalance", e.target.value === "" ? 0 : Number(e.target.value))}
-                placeholder="0"
-                style={{
-                  width: "100%", boxSizing: "border-box",
-                  background: theme.inputBg,
-                  border: `1px solid ${theme.inputBorder}`,
-                  borderRadius: 10, padding: "12px 14px",
-                  color: theme.text, fontSize: 15,
-                  fontFamily: "inherit", outline: "none",
-                  colorScheme: isDark ? "dark" : "light",
-                }}
-              />
-            </div>
-            <div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: theme.textSub, marginBottom: 8 }}>{t.monthlyBudget}</div>
-              <input
-                type="number"
-                value={settings.monthlyBudget || ""}
-                onChange={e => set("monthlyBudget", e.target.value === "" ? 0 : Number(e.target.value))}
-                placeholder="0"
-                style={{
-                  width: "100%", boxSizing: "border-box",
-                  background: theme.inputBg,
-                  border: `1px solid ${theme.inputBorder}`,
-                  borderRadius: 10, padding: "12px 14px",
-                  color: theme.text, fontSize: 15,
-                  fontFamily: "inherit", outline: "none",
-                  colorScheme: isDark ? "dark" : "light",
-                }}
-              />
-            </div>
-          </GlassCard>
-        </Section>
-
         <Section title={t.reminderTime} icon={<IconBell size={14} color={theme.textMuted} />} theme={theme}>
           <GlassCard theme={theme} style={{ padding: "4px 4px" }}>
             {notif ? (
@@ -173,6 +132,25 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, n
               </div>
             )}
           </GlassCard>
+        </Section>
+
+        <Section title={t.guide} icon={<IconBook size={14} color={theme.textMuted} />} theme={theme}>
+          <button onClick={onOpenGuide} style={{
+            width: "100%", padding: "14px 16px",
+            background: theme.glass,
+            border: `1px solid ${theme.glassBorder}`,
+            borderRadius: 14, cursor: "pointer",
+            display: "flex", alignItems: "center", gap: 10,
+            fontFamily: "inherit", fontWeight: 600, fontSize: 14,
+            color: theme.text, backdropFilter: "blur(12px)",
+          }}>
+            <IconBook size={18} color={theme.accent1} />
+            <span style={{ flex: 1, textAlign: lang === "ar" ? "right" : "left" }}>{t.guideTitle}</span>
+            {lang === "ar"
+              ? <IconChevronLeft size={16} color={theme.textMuted} />
+              : <IconChevronRight size={16} color={theme.textMuted} />
+            }
+          </button>
         </Section>
 
         <Section title={t.clearData} icon={<IconTrash size={14} color={theme.textMuted} />} theme={theme}>

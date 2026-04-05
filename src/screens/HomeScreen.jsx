@@ -12,7 +12,7 @@ export default function HomeScreen({ expenses, settings, theme, isDark, t, lang,
     window.navigator.standalone === true;
   const [iosDismissed, setIosDismissed] = useState(() => ls('iosHintDismissed', false));
   const [expandedId, setExpandedId] = useState(null);
-  const fmt = (n) => fmtAmt(n, curr.symbol, lang);
+  const fmt = (n) => fmtAmt(n, curr.symbol, lang, curr.code);
   const catColor = (id) => isDark ? cat(id).colorDark : cat(id).colorLight;
 
   const todayExp = expenses.filter(e => e.date === todayStr());
@@ -47,24 +47,48 @@ export default function HomeScreen({ expenses, settings, theme, isDark, t, lang,
 
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+          {/* App icon — aurora-themed SVG mark */}
           <div style={{
-            width: 44, height: 44, borderRadius: 14, flexShrink: 0,
-            background: "linear-gradient(135deg, #38bdf8 0%, #818cf8 100%)",
+            width: 46, height: 46, borderRadius: 14, flexShrink: 0,
+            background: isDark
+              ? "linear-gradient(135deg, #020d1c 0%, #0c2d4d 100%)"
+              : "linear-gradient(135deg, #e0f5ff 0%, #ede9fe 100%)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            boxShadow: "0 4px 16px rgba(56,189,248,0.35)",
+            boxShadow: isDark
+              ? "0 4px 20px rgba(0,229,160,0.25), inset 0 1px 0 rgba(255,255,255,0.06)"
+              : "0 4px 20px rgba(5,150,105,0.2), inset 0 1px 0 rgba(255,255,255,0.8)",
+            border: `1px solid ${isDark ? "rgba(0,229,160,0.2)" : "rgba(5,150,105,0.15)"}`,
+            position: "relative", overflow: "hidden",
           }}>
-            <span style={{ fontSize: 22 }}>💸</span>
+            {/* Aurora glow inside icon */}
+            <div style={{
+              position: "absolute", inset: 0,
+              background: isDark
+                ? "radial-gradient(circle at 30% 20%, rgba(0,229,160,0.3) 0%, transparent 60%), radial-gradient(circle at 70% 80%, rgba(167,139,250,0.25) 0%, transparent 60%)"
+                : "radial-gradient(circle at 30% 20%, rgba(5,150,105,0.2) 0%, transparent 60%), radial-gradient(circle at 70% 80%, rgba(109,40,217,0.15) 0%, transparent 60%)",
+            }} />
+            {/* "A" lettermark */}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ position: "relative", zIndex: 1 }}>
+              <defs>
+                <linearGradient id="auroraIconGrad" x1="0" y1="0" x2="24" y2="24">
+                  <stop offset="0%" stopColor={isDark ? "#00e5a0" : "#059669"} />
+                  <stop offset="100%" stopColor={isDark ? "#a78bfa" : "#7c3aed"} />
+                </linearGradient>
+              </defs>
+              <path d="M12 3L4 21h3.5l1.5-3.5h6L16.5 21H20L12 3zm0 5.5L15 15H9l3-6.5z"
+                fill="url(#auroraIconGrad)" />
+            </svg>
           </div>
           <div style={{ lineHeight: 1 }}>
             <div style={{
               fontSize: 20, fontWeight: 900, letterSpacing: -0.5,
-              background: "linear-gradient(90deg, #38bdf8, #818cf8)",
+              background: theme.totalGrad,
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
             }}>
-              {lang === "ar" ? "مصروفي" : "MK Tracker"}
+              {lang === "ar" ? "أورورا تراكر" : "Aurora Tracker"}
             </div>
             <div style={{ fontSize: 11, fontWeight: 600, color: theme.textMuted, marginTop: 2 }}>
-              {lang === "ar" ? "MK Tracker" : "مصروفي"}
+              {lang === "ar" ? "تتبّع مصاريفك بذكاء" : "Smart expense tracking"}
             </div>
           </div>
         </div>

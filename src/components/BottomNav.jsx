@@ -1,9 +1,10 @@
 import { SCREENS } from "../constants";
-import { IconHome, IconList, IconChart, IconSettings } from "./Icons";
+import { IconHome, IconWallet, IconList, IconChart, IconSettings } from "./Icons";
 
 export default function BottomNav({ screen, onNavigate, theme, t }) {
   const navItems = [
     { id: SCREENS.HOME,     icon: IconHome,     label: t.home },
+    { id: SCREENS.WALLET,   icon: IconWallet,   label: t.walletScreen },
     { id: SCREENS.ALL,      icon: IconList,     label: t.all },
     { id: SCREENS.REPORTS,  icon: IconChart,    label: t.reports },
     { id: SCREENS.SETTINGS, icon: IconSettings, label: t.settings },
@@ -38,7 +39,7 @@ export default function BottomNav({ screen, onNavigate, theme, t }) {
               background: "none", border: "none", cursor: "pointer",
               display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
               position: "relative",
-              padding: "4px 18px",
+              padding: "4px 10px",
               transition: "transform 0.2s",
               transform: active ? "scale(1)" : "scale(0.95)",
             }}>

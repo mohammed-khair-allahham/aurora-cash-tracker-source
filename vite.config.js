@@ -12,8 +12,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/*.png', 'icons/*.svg'],
       manifest: {
-        name: 'Aurora Spending Tracker',
-        short_name: 'Aurora Wallet',
+        name: 'Aurora Tracker',
+        short_name: 'Aurora Tracker',
         description: 'Track your daily cash spending — Arabic & English',
         theme_color: '#090e18',
         background_color: '#090e18',

@@ -68,6 +68,18 @@ export function IconSun(p) {
   return <I {...p}><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></I>;
 }
 
+export function IconArrowUp(p) {
+  return <I {...p}><line x1="12" y1="19" x2="12" y2="5" /><polyline points="5,12 12,5 19,12" /></I>;
+}
+
+export function IconArrowDown(p) {
+  return <I {...p}><line x1="12" y1="5" x2="12" y2="19" /><polyline points="19,12 12,19 5,12" /></I>;
+}
+
+export function IconBook(p) {
+  return <I {...p}><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2V3z" /><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7V3z" /></I>;
+}
+
 export function IconCoin(p) {
   return <I {...p}><circle cx="12" cy="12" r="9" /><path d="M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.66 0-3 1-3 2.5S10.34 13 12 13c1.66 0 3 1 3 2.5S13.66 18 12 18c-1 0-2-.5-2.5-1.5" /><line x1="12" y1="6" x2="12" y2="8" /><line x1="12" y1="16" x2="12" y2="18" /></I>;
 }

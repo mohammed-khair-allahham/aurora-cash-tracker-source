@@ -6,13 +6,16 @@ import BottomNav from "./components/BottomNav";
 import { IconPlus } from "./components/Icons";
 import HomeScreen from "./screens/HomeScreen";
 import AddScreen from "./screens/AddScreen";
+import WalletScreen from "./screens/WalletScreen";
 import ReportsScreen from "./screens/ReportsScreen";
 import AllScreen from "./screens/AllScreen";
 import SettingsScreen from "./screens/SettingsScreen";
+import GuideScreen from "./screens/GuideScreen";
 
 export default function App() {
   const [screen,    setScreen]    = useState(SCREENS.HOME);
   const [expenses,  setExpenses]  = useState(() => ls("ct_expenses", []));
+  const [walletTxns, setWalletTxns] = useState(() => ls("ct_wallet_txns", []));
   const [settings,  setSettings]  = useState(() => ({
     currency: "SYP", lang: "ar",
     theme: window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light",
@@ -34,6 +37,7 @@ export default function App() {
   useEffect(() => { lsSet("ct_expenses", expenses); }, [expenses]);
   useEffect(() => { lsSet("ct_settings", settings); }, [settings]);
   useEffect(() => { lsSet("ct_subcategories", subcategories); }, [subcategories]);
+  useEffect(() => { lsSet("ct_wallet_txns", walletTxns); }, [walletTxns]);
 
   const notifTimerRef = useRef(null);
   useEffect(() => {
@@ -108,6 +112,11 @@ export default function App() {
     const exp = expenses.find(e => e.id === id);
     if (exp) setSettings(s => ({ ...s, walletBalance: (s.walletBalance || 0) + Number(exp.amount) }));
     setExpenses(p => p.filter(e => e.id !== id));
+  };
+
+  const addTopUp = (txn) => {
+    setWalletTxns(prev => [{ ...txn, id: Date.now().toString() }, ...prev]);
+    setSettings(s => ({ ...s, walletBalance: (s.walletBalance || 0) + Number(txn.amount) }));
   };
 
   const startEdit = (exp) => {
@@ -187,6 +196,16 @@ export default function App() {
             onAddSubcategory={addSubcategory}
           />
         )}
+        {screen === SCREENS.WALLET && (
+          <WalletScreen
+            {...commonProps}
+            settings={settings}
+            expenses={expenses}
+            walletTxns={walletTxns}
+            onTopUp={addTopUp}
+            onSettingsChange={setSettings}
+          />
+        )}
         {screen === SCREENS.ALL && (
           <AllScreen
             {...commonProps}
@@ -209,17 +228,24 @@ export default function App() {
             onChange={setSettings}
             notif={notif}
             onRequestNotif={requestNotif}
-            onClear={() => setExpenses([])}
+            onClear={() => { setExpenses([]); setWalletTxns([]); }}
+            onOpenGuide={() => setScreen(SCREENS.GUIDE)}
+          />
+        )}
+        {screen === SCREENS.GUIDE && (
+          <GuideScreen
+            {...commonProps}
+            onBack={() => setScreen(SCREENS.SETTINGS)}
           />
         )}
       </div>
 
       {/* FAB */}
-      {screen !== SCREENS.ADD && (
+      {screen !== SCREENS.ADD && screen !== SCREENS.SETTINGS && screen !== SCREENS.GUIDE && (
         <button onClick={() => handleNavigate(SCREENS.ADD)} style={{
           position: "fixed",
           bottom: 90,
-          right: "max(16px, calc(50vw - 215px + 16px))",
+          [lang === "ar" ? "left" : "right"]: "max(16px, calc(50vw - 215px + 16px))",
           width: 60, height: 60, borderRadius: "50%",
           background: theme.btnGrad,
           border: "2px solid rgba(255,255,255,0.15)",
@@ -234,13 +260,14 @@ export default function App() {
         </button>
       )}
 
-      <BottomNav
-        screen={screen}
-        onNavigate={handleNavigate}
-        theme={theme}
-        isDark={isDark}
-        t={t}
-      />
+      {screen !== SCREENS.GUIDE && (
+        <BottomNav
+          screen={screen}
+          onNavigate={handleNavigate}
+          theme={theme}
+          t={t}
+        />
+      )}
     </div>
   );
 }

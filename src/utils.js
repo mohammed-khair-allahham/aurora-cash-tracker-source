@@ -23,9 +23,9 @@ export function fmtDate(dateStr, lang, months) {
     : `${months[parseInt(m) - 1]} ${d}, ${y}`;
 }
 
-export function fmtAmt(n, sym, lang) {
+export function fmtAmt(n, sym, lang, code) {
   const s = Number(n).toLocaleString(lang === "ar" ? "ar-SA" : "en-US");
-  return lang === "ar" ? `${s} ${sym}` : `${sym}${s}`;
+  return lang === "ar" ? `${s} ${sym}` : `${s} ${code || sym}`;
 }
 
 export function getDaysInMonth(y, m) {

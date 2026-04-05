@@ -16,7 +16,7 @@ function ChartTooltip({ active, payload, theme, fmt }) {
 }
 
 export default function ReportsScreen({ expenses, settings, theme, isDark, t, lang, curr }) {
-  const fmt = (n) => fmtAmt(n, curr.symbol, lang);
+  const fmt = (n) => fmtAmt(n, curr.symbol, lang, curr.code);
 
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth());

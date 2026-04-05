@@ -12,7 +12,7 @@ export default function AllScreen({ expenses, theme, isDark, t, lang, curr, onEd
   const [loading, setLoading] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
   const scrollRef = useRef(null);
-  const fmt = (n) => fmtAmt(n, curr.symbol, lang);
+  const fmt = (n) => fmtAmt(n, curr.symbol, lang, curr.code);
   const catColor = (id) => isDark ? cat(id).colorDark : cat(id).colorLight;
 
   const sorted = [...expenses].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
