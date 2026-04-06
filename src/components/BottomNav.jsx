@@ -25,7 +25,7 @@ export default function BottomNav({ screen, onNavigate, theme, t }) {
         background: theme.navBg,
         backdropFilter: "blur(32px)",
         WebkitBackdropFilter: "blur(32px)",
-        borderTop: `1px solid ${theme.glassBorder}`,
+        borderTop: `1px solid rgba(255,255,255,0.08)`,
         display: "flex", justifyContent: "space-around", alignItems: "center",
         padding: "10px 0 18px",
         zIndex: 200,
@@ -56,7 +56,7 @@ export default function BottomNav({ screen, onNavigate, theme, t }) {
               )}
               <Icon
                 size={22}
-                color={active ? theme.navIndicator : theme.textSub}
+                color={active ? theme.navIndicator : theme.navText}
                 style={{ transition: "color 0.2s", opacity: active ? 1 : 0.5 }}
               />
               <span style={{
