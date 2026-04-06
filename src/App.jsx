@@ -119,6 +119,12 @@ export default function App() {
     setSettings(s => ({ ...s, walletBalance: (s.walletBalance || 0) + Number(txn.amount) }));
   };
 
+  const deleteTopUp = (id) => {
+    const txn = walletTxns.find(t => t.id === id);
+    if (txn) setSettings(s => ({ ...s, walletBalance: (s.walletBalance || 0) - Number(txn.amount) }));
+    setWalletTxns(prev => prev.filter(t => t.id !== id));
+  };
+
   const startEdit = (exp) => {
     setEditingId(exp.id);
     setScreen(SCREENS.ADD);
@@ -203,6 +209,7 @@ export default function App() {
             expenses={expenses}
             walletTxns={walletTxns}
             onTopUp={addTopUp}
+            onDeleteTopUp={deleteTopUp}
             onSettingsChange={setSettings}
           />
         )}

@@ -1,13 +1,14 @@
 import { useState } from "react";
 import GlassCard from "../components/GlassCard";
 import GlowBg from "../components/GlowBg";
-import { IconWallet, IconArrowUp, IconPlus } from "../components/Icons";
+import { IconWallet, IconArrowUp, IconPlus, IconTrash } from "../components/Icons";
 import { fmtAmt, todayStr, fmtDate } from "../utils";
 
-export default function WalletScreen({ expenses, settings, walletTxns, onTopUp, onSettingsChange, theme, isDark, t, lang, curr }) {
+export default function WalletScreen({ expenses, settings, walletTxns, onTopUp, onDeleteTopUp, onSettingsChange, theme, isDark, t, lang, curr }) {
   const [showTopUp, setShowTopUp] = useState(false);
   const [topUpAmount, setTopUpAmount] = useState("");
   const [topUpNote, setTopUpNote] = useState("");
+  const [expandedId, setExpandedId] = useState(null);
 
   const fmt = (n) => fmtAmt(n, curr.symbol, lang, curr.code);
   const walletBalance = settings.walletBalance || 0;
@@ -205,12 +206,14 @@ export default function WalletScreen({ expenses, settings, walletTxns, onTopUp, 
           const bgColor = isDark ? "rgba(0,229,160,0.12)" : "rgba(5,150,105,0.08)";
           const borderColor = isDark ? "rgba(0,229,160,0.25)" : "rgba(5,150,105,0.2)";
           const borderSide = lang === "ar" ? "borderRight" : "borderLeft";
+          const isExpanded = expandedId === tx.id;
 
           return (
             <GlassCard key={tx.id} theme={theme} style={{
               padding: "12px 14px", marginBottom: 8,
               [borderSide]: `3px solid ${color}`,
-            }}>
+              cursor: "pointer",
+            }} onClick={() => setExpandedId(isExpanded ? null : tx.id)}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{
                   width: 40, height: 40, borderRadius: 12, flexShrink: 0,
@@ -234,6 +237,32 @@ export default function WalletScreen({ expenses, settings, walletTxns, onTopUp, 
 
                 <div style={{ fontWeight: 800, fontSize: 16, color, flexShrink: 0 }}>
                   +{fmt(tx.amount)}
+                </div>
+              </div>
+
+              {/* Expandable delete row */}
+              <div style={{
+                maxHeight: isExpanded ? 48 : 0,
+                opacity: isExpanded ? 1 : 0,
+                overflow: "hidden",
+                transition: "max-height 0.25s ease, opacity 0.2s ease",
+              }}>
+                <div style={{
+                  display: "flex", gap: 8,
+                  justifyContent: lang === "ar" ? "flex-start" : "flex-end",
+                  paddingTop: 10,
+                }}>
+                  <button onClick={(e) => { e.stopPropagation(); onDeleteTopUp(tx.id); setExpandedId(null); }} style={{
+                    background: isDark ? "rgba(239,68,68,0.12)" : "rgba(239,68,68,0.08)",
+                    border: "1px solid rgba(239,68,68,0.25)",
+                    borderRadius: 10, color: "#ef4444", fontSize: 12,
+                    padding: "6px 14px", cursor: "pointer",
+                    display: "flex", alignItems: "center", gap: 5, fontWeight: 600,
+                    fontFamily: "inherit",
+                  }}>
+                    <IconTrash size={14} color="#ef4444" />
+                    {lang === "ar" ? "حذف" : "Delete"}
+                  </button>
                 </div>
               </div>
             </GlassCard>
