@@ -89,6 +89,9 @@ const T = {
     guideStep7Desc: "In Settings, set a monthly budget to track your spending limit. A progress ring on the Home screen shows how much you've used.",
     guideStep8Title: "Customize Your App",
     guideStep8Desc: "In Settings, switch between English/Arabic, dark/light theme, and set daily spending reminders.",
+    welcomeTitle: "Welcome to Aurora",
+    welcomeSubtitle: "Your personal cash tracker. Here's a quick guide to get you started.",
+    getStarted: "Get Started",
     cats: {
       food: "Food", transport: "Transport", groceries: "Groceries",
       entertainment: "Entertainment", health: "Health", home: "Home",
@@ -186,6 +189,9 @@ const T = {
     guideStep7Desc: "في الإعدادات، حدد ميزانية شهرية لتتبع حد الإنفاق. حلقة التقدم في الشاشة الرئيسية تُظهر كم استخدمت.",
     guideStep8Title: "خصّص تطبيقك",
     guideStep8Desc: "في الإعدادات، بدّل بين العربية/الإنجليزية، المظهر الداكن/الفاتح، وفعّل تذكيرات الإنفاق اليومية.",
+    welcomeTitle: "مرحباً بك في أورورا",
+    welcomeSubtitle: "متتبع نقودك الشخصي. إليك دليل سريع للبدء.",
+    getStarted: "ابدأ الآن",
     cats: {
       food: "طعام", transport: "مواصلات", groceries: "بقالة",
       entertainment: "ترفيه", health: "صحة", home: "منزل",

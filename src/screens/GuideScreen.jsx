@@ -6,7 +6,7 @@ const STEP_ICONS = [IconWallet, IconPlus, IconHome, IconList, IconWallet, IconCh
 const STEP_COLORS_DARK = ["#00e5a0", "#38bdf8", "#a78bfa", "#fb923c", "#34d399", "#f472b6", "#fbbf24", "#818cf8"];
 const STEP_COLORS_LIGHT = ["#059669", "#0ea5e9", "#7c3aed", "#ea580c", "#059669", "#db2777", "#d97706", "#4f46e5"];
 
-export default function GuideScreen({ theme, isDark, t, lang, onBack }) {
+export default function GuideScreen({ theme, isDark, t, lang, onBack, onboarding, onFinish }) {
   const BackIcon = lang === "ar" ? IconChevronRight : IconChevronLeft;
 
   const steps = [
@@ -26,22 +26,42 @@ export default function GuideScreen({ theme, isDark, t, lang, onBack }) {
       <div style={{ padding: "52px 20px 84px", position: "relative", zIndex: 1 }}>
 
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
-          <button onClick={onBack} style={{
-            background: theme.glass, border: `1px solid ${theme.glassBorder}`,
-            borderRadius: 12, color: theme.text, padding: "9px 12px",
-            cursor: "pointer", backdropFilter: "blur(12px)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            <BackIcon size={18} color={theme.text} />
-          </button>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <IconBook size={22} color={theme.text} />
-            <h2 style={{ margin: 0, fontWeight: 800, fontSize: 22, color: theme.text }}>
-              {t.guideTitle}
-            </h2>
+        {onboarding ? (
+          <div style={{ textAlign: "center", marginBottom: 28 }}>
+            <div style={{
+              width: 72, height: 72, borderRadius: 22,
+              background: theme.btnGrad,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              margin: "0 auto 16px",
+              boxShadow: "0 4px 20px rgba(56,189,248,0.25)",
+            }}>
+              <IconBook size={34} color="#fff" />
+            </div>
+            <h1 style={{ margin: "0 0 8px", fontWeight: 900, fontSize: 26, color: theme.text }}>
+              {t.welcomeTitle}
+            </h1>
+            <p style={{ margin: 0, fontSize: 14, color: theme.textSub, lineHeight: 1.5 }}>
+              {t.welcomeSubtitle}
+            </p>
           </div>
-        </div>
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
+            <button onClick={onBack} style={{
+              background: theme.glass, border: `1px solid ${theme.glassBorder}`,
+              borderRadius: 12, color: theme.text, padding: "9px 12px",
+              cursor: "pointer", backdropFilter: "blur(12px)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <BackIcon size={18} color={theme.text} />
+            </button>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <IconBook size={22} color={theme.text} />
+              <h2 style={{ margin: 0, fontWeight: 800, fontSize: 22, color: theme.text }}>
+                {t.guideTitle}
+              </h2>
+            </div>
+          </div>
+        )}
 
         {/* Steps */}
         {steps.map((step, i) => {
@@ -114,6 +134,22 @@ export default function GuideScreen({ theme, isDark, t, lang, onBack }) {
             }
           </div>
         </div>
+
+        {/* Get Started button (onboarding only) */}
+        {onboarding && (
+          <button onClick={onFinish} style={{
+            width: "100%", padding: "16px",
+            marginTop: 24,
+            background: theme.btnGrad,
+            border: "none", borderRadius: 16,
+            color: "#fff", fontSize: 17, fontWeight: 800,
+            cursor: "pointer", fontFamily: "inherit",
+            boxShadow: "0 4px 20px rgba(56,189,248,0.25)",
+            letterSpacing: 0.3,
+          }}>
+            {t.getStarted}
+          </button>
+        )}
       </div>
     </div>
   );

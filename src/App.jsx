@@ -23,6 +23,7 @@ export default function App() {
     ...ls("ct_settings", {}),
   }));
   const [editingId, setEditingId] = useState(null);
+  const [showOnboarding, setShowOnboarding] = useState(() => !ls("ct_onboarded", false));
   const [subcategories, setSubcategories] = useState(() => ls("ct_subcategories", {}));
   const [notif,     setNotif]     = useState(
     typeof Notification !== "undefined" && Notification.permission === "granted"
@@ -175,8 +176,19 @@ export default function App() {
         }
       `}</style>
 
+      {/* First-time onboarding */}
+      {showOnboarding && (
+        <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", animation: "fadeSlideIn 0.25s ease-out" }}>
+          <GuideScreen
+            {...commonProps}
+            onboarding
+            onFinish={() => { lsSet("ct_onboarded", true); setShowOnboarding(false); }}
+          />
+        </div>
+      )}
+
       {/* Screen content with fade-slide transition */}
-      <div key={screen} style={{
+      {!showOnboarding && <div key={screen} style={{
         flex: 1, overflow: "hidden",
         display: "flex", flexDirection: "column",
         animation: "fadeSlideIn 0.25s ease-out",
@@ -245,10 +257,10 @@ export default function App() {
             onBack={() => setScreen(SCREENS.SETTINGS)}
           />
         )}
-      </div>
+      </div>}
 
       {/* FAB */}
-      {screen !== SCREENS.ADD && screen !== SCREENS.SETTINGS && screen !== SCREENS.GUIDE && (
+      {!showOnboarding && screen !== SCREENS.ADD && screen !== SCREENS.SETTINGS && screen !== SCREENS.GUIDE && (
         <button onClick={() => handleNavigate(SCREENS.ADD)} style={{
           position: "fixed",
           bottom: 90,
@@ -267,7 +279,7 @@ export default function App() {
         </button>
       )}
 
-      {screen !== SCREENS.GUIDE && (
+      {!showOnboarding && screen !== SCREENS.GUIDE && (
         <BottomNav
           screen={screen}
           onNavigate={handleNavigate}
