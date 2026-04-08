@@ -127,15 +127,15 @@ export default function HomeScreen({ expenses, settings, theme, isDark, t, lang,
           </div>
         )}
 
-        {/* Premium Wallet Card */}
+        {/* Unified Dashboard Card */}
         <GlassCard theme={theme} variant="wallet" style={{ padding: 0, marginBottom: 16, overflow: "hidden" }}>
           {/* Gradient accent stripe */}
           <div style={{ height: 3, background: theme.walletAccent }} />
 
-          <div style={{ padding: "16px 20px 18px" }}>
-            {/* Wallet header */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-              <IconWallet size={16} color={theme.textMuted} />
+          <div style={{ padding: "18px 20px 0" }}>
+            {/* Wallet header row */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+              <IconWallet size={15} color={theme.textMuted} />
               <span style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase" }}>
                 {t.walletBalance}
               </span>
@@ -143,15 +143,15 @@ export default function HomeScreen({ expenses, settings, theme, isDark, t, lang,
 
             {/* Balance + budget ring row */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div>
+              <div style={{ minWidth: 0 }}>
                 <div style={{
-                  fontSize: 34, fontWeight: 900, lineHeight: 1.1,
+                  fontSize: 32, fontWeight: 900, lineHeight: 1.1,
                   color: walletBalance >= 0 ? theme.accent1 : "#ef4444",
                 }}>
                   {fmt(walletBalance)}
                 </div>
                 {budget > 0 && (
-                  <div style={{ display: "flex", gap: 12, marginTop: 10, fontSize: 11, fontWeight: 600 }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8, fontSize: 11, fontWeight: 600 }}>
                     <span style={{ color: theme.textSub }}>{t.monthlyBudget}: {fmt(budget)}</span>
                     <span style={{ color: budgetRemaining >= 0 ? theme.accent1 : "#ef4444", fontWeight: 700 }}>
                       {budgetRemaining >= 0 ? t.remaining : t.overBudget}: {fmt(Math.abs(budgetRemaining))}
@@ -162,8 +162,8 @@ export default function HomeScreen({ expenses, settings, theme, isDark, t, lang,
 
               {/* Circular budget ring */}
               {budget > 0 && (
-                <div style={{ position: "relative", width: 64, height: 64, flexShrink: 0 }}>
-                  <svg width={64} height={64} viewBox="0 0 64 64">
+                <div style={{ position: "relative", width: 60, height: 60, flexShrink: 0, marginLeft: 12 }}>
+                  <svg width={60} height={60} viewBox="0 0 64 64">
                     <circle cx={32} cy={32} r={ringR} fill="none" stroke={theme.progressRing.track} strokeWidth={5} />
                     <circle cx={32} cy={32} r={ringR} fill="none"
                       stroke="url(#budgetGrad)" strokeWidth={5}
@@ -183,7 +183,7 @@ export default function HomeScreen({ expenses, settings, theme, isDark, t, lang,
                   <div style={{
                     position: "absolute", inset: 0,
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 12, fontWeight: 800,
+                    fontSize: 11, fontWeight: 800,
                     color: budgetRemaining >= 0 ? theme.accent1 : "#ef4444",
                   }}>
                     {Math.round(budgetPct)}%
@@ -192,45 +192,98 @@ export default function HomeScreen({ expenses, settings, theme, isDark, t, lang,
               )}
             </div>
           </div>
-        </GlassCard>
 
-        {/* Today's total */}
-        <div style={{ fontSize: 12, fontWeight: 600, color: theme.textSub, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>
-          {t.todayTotal}
-        </div>
-        <div style={{
-          fontSize: lang === "ar" ? 44 : 50, fontWeight: 900, letterSpacing: -1,
-          background: theme.totalGrad,
-          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-          lineHeight: 1.05, marginBottom: 8,
-        }}>
-          {fmt(todayTotal)}
-        </div>
-        <div style={{ fontSize: 13, color: theme.textMuted }}>
-          {todayExp.length} {t.transactions}
-        </div>
+          {/* Divider */}
+          <div style={{
+            height: 1, margin: "16px 20px",
+            background: isDark
+              ? "linear-gradient(90deg, transparent, rgba(0,229,160,0.18), rgba(167,139,250,0.18), transparent)"
+              : "linear-gradient(90deg, transparent, rgba(5,150,105,0.18), rgba(109,40,217,0.18), transparent)",
+          }} />
 
-        {/* Category chips */}
-        {todayCats.length > 0 && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 16 }}>
-            {todayCats.map(([catId, total]) => {
-              const c = cat(catId);
-              const color = catColor(catId);
-              return (
-                <div key={catId} style={{
-                  background: c.bg + (isDark ? "0.15)" : "0.12)"),
-                  border: `1px solid ${c.bg + (isDark ? "0.30)" : "0.25)")}`,
-                  borderRadius: 20, padding: "5px 12px",
-                  fontSize: 12, fontWeight: 700, color,
-                  display: "flex", alignItems: "center", gap: 5,
-                }}>
-                  <span>{c.emoji}</span>
-                  <span>{fmt(total)}</span>
-                </div>
-              );
-            })}
+          {/* Today + Month stat boxes */}
+          <div style={{ padding: "0 20px", display: "flex", gap: 10 }}>
+            {/* Today's spending box */}
+            <div style={{
+              flex: 1, borderRadius: 14, padding: "12px 14px",
+              background: isDark ? "rgba(0,229,160,0.06)" : "rgba(5,150,105,0.05)",
+              border: `1px solid ${isDark ? "rgba(0,229,160,0.12)" : "rgba(5,150,105,0.12)"}`,
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                <div style={{
+                  width: 22, height: 22, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center",
+                  background: isDark ? "rgba(0,229,160,0.15)" : "rgba(5,150,105,0.12)",
+                  fontSize: 11,
+                }}>📉</div>
+                <span style={{ fontSize: 10, fontWeight: 700, color: theme.textMuted, letterSpacing: 0.8, textTransform: "uppercase" }}>
+                  {t.todayTotal}
+                </span>
+              </div>
+              <div style={{
+                fontSize: 20, fontWeight: 900, lineHeight: 1.15,
+                background: theme.totalGrad,
+                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+              }}>
+                {fmt(todayTotal)}
+              </div>
+              <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4, fontWeight: 600 }}>
+                {todayExp.length} {t.transactions}
+              </div>
+            </div>
+
+            {/* Monthly spending box */}
+            <div style={{
+              flex: 1, borderRadius: 14, padding: "12px 14px",
+              background: isDark ? "rgba(167,139,250,0.06)" : "rgba(109,40,217,0.05)",
+              border: `1px solid ${isDark ? "rgba(167,139,250,0.12)" : "rgba(109,40,217,0.12)"}`,
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                <div style={{
+                  width: 22, height: 22, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center",
+                  background: isDark ? "rgba(167,139,250,0.15)" : "rgba(109,40,217,0.12)",
+                  fontSize: 11,
+                }}>📊</div>
+                <span style={{ fontSize: 10, fontWeight: 700, color: theme.textMuted, letterSpacing: 0.8, textTransform: "uppercase" }}>
+                  {t.monthly}
+                </span>
+              </div>
+              <div style={{
+                fontSize: 20, fontWeight: 900, lineHeight: 1.15,
+                color: theme.accent2,
+              }}>
+                {fmt(monthSpent)}
+              </div>
+              <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4, fontWeight: 600 }}>
+                {t.spent}
+              </div>
+            </div>
           </div>
-        )}
+
+          {/* Category chips */}
+          {todayCats.length > 0 && (
+            <div style={{ padding: "14px 20px 0", display: "flex", flexWrap: "wrap", gap: 7 }}>
+              {todayCats.map(([catId, total]) => {
+                const c = cat(catId);
+                const color = catColor(catId);
+                return (
+                  <div key={catId} style={{
+                    background: c.bg + (isDark ? "0.10)" : "0.08)"),
+                    border: `1px solid ${c.bg + (isDark ? "0.22)" : "0.18)")}`,
+                    borderRadius: 20, padding: "4px 10px",
+                    fontSize: 11, fontWeight: 700, color,
+                    display: "flex", alignItems: "center", gap: 4,
+                  }}>
+                    <span style={{ fontSize: 12 }}>{c.emoji}</span>
+                    <span>{fmt(total)}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Bottom padding */}
+          <div style={{ height: 18 }} />
+        </GlassCard>
       </div>
 
       {/* Transaction list — only this scrolls (today only) */}
