@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import GlassCard from "../components/GlassCard";
 import GlowBg from "../components/GlowBg";
@@ -21,6 +21,8 @@ export default function ReportsScreen({ expenses, settings, theme, isDark, t, la
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth());
   const [year,  setYear]  = useState(now.getFullYear());
+
+  const isCurrentMonth = month === now.getMonth() && year === now.getFullYear();
 
   const monthExp = expenses.filter(e => {
     const d = new Date(e.date);
@@ -48,6 +50,20 @@ export default function ReportsScreen({ expenses, settings, theme, isDark, t, la
     };
   });
   const maxDay = Math.max(...dailyData.map(d => d.total), 1);
+
+  // Forecast calculations (current month only)
+  const forecast = useMemo(() => {
+    if (!isCurrentMonth || monthTotal === 0) return null;
+    const dayOfMonth = now.getDate();
+    const daysInMonth = getDaysInMonth(year, month);
+    const daysRemaining = daysInMonth - dayOfMonth;
+    const dailyAvg = monthTotal / dayOfMonth;
+    const projected = dailyAvg * daysInMonth;
+    const budget = settings.monthlyBudget || 0;
+    const projectedVsBudget = budget > 0 ? projected - budget : null;
+    const pct = budget > 0 ? Math.min((projected / budget) * 100, 150) : 0;
+    return { dayOfMonth, daysInMonth, daysRemaining, dailyAvg, projected, budget, projectedVsBudget, pct };
+  }, [isCurrentMonth, monthTotal, month, year, settings.monthlyBudget]);
 
   const prevMonth = () => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); };
   const nextMonth = () => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); };
@@ -99,12 +115,107 @@ export default function ReportsScreen({ expenses, settings, theme, isDark, t, la
           </GlassCard>
         </div>
 
+        {/* Smart Forecast (current month only) */}
+        {forecast && (
+          <GlassCard theme={theme} variant="elevated" style={{ padding: 0, marginBottom: 18, overflow: "hidden" }}>
+            <div style={{
+              height: 3,
+              background: forecast.projectedVsBudget !== null && forecast.projectedVsBudget > 0
+                ? "linear-gradient(90deg, #f97316, #ef4444)"
+                : theme.walletAccent,
+            }} />
+            <div style={{ padding: "16px 18px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                <span style={{ fontSize: 16 }}>🔮</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase" }}>
+                  {t.forecast}
+                </span>
+                <div style={{
+                  marginLeft: "auto",
+                  fontSize: 10, fontWeight: 700,
+                  color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.3)",
+                  background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)",
+                  borderRadius: 8, padding: "3px 8px",
+                }}>
+                  {forecast.daysRemaining} {t.daysRemaining}
+                </div>
+              </div>
+
+              {/* Projected + Daily avg row */}
+              <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+                <div style={{
+                  flex: 1, borderRadius: 12, padding: "10px 12px",
+                  background: isDark ? "rgba(0,229,160,0.06)" : "rgba(5,150,105,0.05)",
+                  border: `1px solid ${isDark ? "rgba(0,229,160,0.10)" : "rgba(5,150,105,0.10)"}`,
+                }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: theme.textMuted, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>
+                    {t.projectedTotal}
+                  </div>
+                  <div style={{ fontSize: 20, fontWeight: 900, color: theme.accent1 }}>
+                    {fmt(Math.round(forecast.projected))}
+                  </div>
+                </div>
+                <div style={{
+                  flex: 1, borderRadius: 12, padding: "10px 12px",
+                  background: isDark ? "rgba(167,139,250,0.06)" : "rgba(109,40,217,0.05)",
+                  border: `1px solid ${isDark ? "rgba(167,139,250,0.10)" : "rgba(109,40,217,0.10)"}`,
+                }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: theme.textMuted, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>
+                    {t.dailyAvg}
+                  </div>
+                  <div style={{ fontSize: 20, fontWeight: 900, color: theme.accent2 }}>
+                    {fmt(Math.round(forecast.dailyAvg))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Budget comparison bar */}
+              {forecast.budget > 0 ? (
+                <>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: theme.textMuted, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                      {t.projectedTotal} vs {t.monthlyBudget}
+                    </span>
+                    <span style={{ fontSize: 10, fontWeight: 800, color: theme.textSub }}>
+                      {Math.round(forecast.pct)}%
+                    </span>
+                  </div>
+                  <div style={{ height: 6, borderRadius: 3, background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)", overflow: "hidden", marginBottom: 10 }}>
+                    <div style={{
+                      height: "100%", borderRadius: 3,
+                      width: `${Math.min(forecast.pct, 100)}%`,
+                      background: forecast.projectedVsBudget <= 0
+                        ? `linear-gradient(90deg, ${theme.accent1}, ${theme.accent2})`
+                        : "linear-gradient(90deg, #f97316, #ef4444)",
+                      transition: "width 0.6s ease",
+                    }} />
+                  </div>
+                  <div style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    fontSize: 12, fontWeight: 700,
+                    color: forecast.projectedVsBudget <= 0 ? theme.accent1 : "#ef4444",
+                  }}>
+                    <span style={{ fontSize: 14 }}>{forecast.projectedVsBudget <= 0 ? "✅" : "⚠️"}</span>
+                    {forecast.projectedVsBudget <= 0
+                      ? t.onTrack
+                      : `${t.willExceed} ${fmt(Math.round(forecast.projectedVsBudget))}`}
+                  </div>
+                </>
+              ) : (
+                <div style={{ fontSize: 12, color: theme.textMuted, fontWeight: 600 }}>
+                  💡 {t.noBudgetSet}
+                </div>
+              )}
+            </div>
+          </GlassCard>
+        )}
+
         {/* Category pie chart */}
         {catData.length > 0 && (
           <GlassCard theme={theme} style={{ padding: "18px", marginBottom: 18 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 14 }}>{t.byCategory}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              {/* Larger pie chart with center total */}
+              {/* Pie chart with center total */}
               <div style={{ position: "relative", width: 180, height: 180, flexShrink: 0 }}>
                 <PieChart width={180} height={180}>
                   <Pie data={catData} cx={85} cy={85} innerRadius={52} outerRadius={80} dataKey="value" strokeWidth={0}>
@@ -120,13 +231,17 @@ export default function ReportsScreen({ expenses, settings, theme, isDark, t, la
                 </div>
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                {catData.slice(0, 5).map(c => (
-                  <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 8 }}>
-                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
-                    <span style={{ fontSize: 12, fontWeight: 600, flex: 1, color: theme.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.emoji} {t.cats[c.id]}</span>
-                    <span style={{ fontSize: 11, fontWeight: 800, color: c.color }}>{fmt(c.value)}</span>
-                  </div>
-                ))}
+                {catData.slice(0, 5).map(c => {
+                  const pct = monthTotal > 0 ? Math.round((c.value / monthTotal) * 100) : 0;
+                  return (
+                    <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 8 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
+                      <span style={{ fontSize: 12, fontWeight: 600, flex: 1, color: theme.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.emoji} {t.cats[c.id]}</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: theme.textSub, minWidth: 28, textAlign: "right" }}>{pct}%</span>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: c.color }}>{fmt(c.value)}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </GlassCard>
