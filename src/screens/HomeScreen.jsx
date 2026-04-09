@@ -201,60 +201,35 @@ export default function HomeScreen({ expenses, settings, theme, isDark, t, lang,
               : "linear-gradient(90deg, transparent, rgba(5,150,105,0.18), rgba(109,40,217,0.18), transparent)",
           }} />
 
-          {/* Today + Month stat boxes */}
-          <div style={{ padding: "0 20px", display: "flex", gap: 10 }}>
-            {/* Today's spending box */}
+          {/* Today's spending box */}
+          <div style={{ padding: "0 20px" }}>
             <div style={{
-              flex: 1, borderRadius: 14, padding: "12px 14px",
+              borderRadius: 14, padding: "12px 14px",
               background: isDark ? "rgba(0,229,160,0.06)" : "rgba(5,150,105,0.05)",
               border: `1px solid ${isDark ? "rgba(0,229,160,0.12)" : "rgba(5,150,105,0.12)"}`,
+              display: "flex", alignItems: "center", justifyContent: "space-between",
             }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                  <div style={{
+                    width: 22, height: 22, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center",
+                    background: isDark ? "rgba(0,229,160,0.15)" : "rgba(5,150,105,0.12)",
+                    fontSize: 11,
+                  }}>📉</div>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: theme.textMuted, letterSpacing: 0.8, textTransform: "uppercase" }}>
+                    {t.todayTotal}
+                  </span>
+                </div>
                 <div style={{
-                  width: 22, height: 22, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center",
-                  background: isDark ? "rgba(0,229,160,0.15)" : "rgba(5,150,105,0.12)",
-                  fontSize: 11,
-                }}>📉</div>
-                <span style={{ fontSize: 10, fontWeight: 700, color: theme.textMuted, letterSpacing: 0.8, textTransform: "uppercase" }}>
-                  {t.todayTotal}
-                </span>
+                  fontSize: 22, fontWeight: 900, lineHeight: 1.15,
+                  background: theme.totalGrad,
+                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                }}>
+                  {fmt(todayTotal)}
+                </div>
               </div>
-              <div style={{
-                fontSize: 20, fontWeight: 900, lineHeight: 1.15,
-                background: theme.totalGrad,
-                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-              }}>
-                {fmt(todayTotal)}
-              </div>
-              <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4, fontWeight: 600 }}>
+              <div style={{ fontSize: 12, color: theme.textMuted, fontWeight: 600 }}>
                 {todayExp.length} {t.transactions}
-              </div>
-            </div>
-
-            {/* Monthly spending box */}
-            <div style={{
-              flex: 1, borderRadius: 14, padding: "12px 14px",
-              background: isDark ? "rgba(167,139,250,0.06)" : "rgba(109,40,217,0.05)",
-              border: `1px solid ${isDark ? "rgba(167,139,250,0.12)" : "rgba(109,40,217,0.12)"}`,
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                <div style={{
-                  width: 22, height: 22, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center",
-                  background: isDark ? "rgba(167,139,250,0.15)" : "rgba(109,40,217,0.12)",
-                  fontSize: 11,
-                }}>📊</div>
-                <span style={{ fontSize: 10, fontWeight: 700, color: theme.textMuted, letterSpacing: 0.8, textTransform: "uppercase" }}>
-                  {t.monthly}
-                </span>
-              </div>
-              <div style={{
-                fontSize: 20, fontWeight: 900, lineHeight: 1.15,
-                color: theme.accent2,
-              }}>
-                {fmt(monthSpent)}
-              </div>
-              <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4, fontWeight: 600 }}>
-                {t.spent}
               </div>
             </div>
           </div>

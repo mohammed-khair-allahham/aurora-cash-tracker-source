@@ -1,67 +1,124 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useMemo } from "react";
 import GlassCard from "../components/GlassCard";
 import GlowBg from "../components/GlowBg";
-import { IconList, IconEdit, IconTrash } from "../components/Icons";
+import { IconList, IconEdit, IconTrash, IconChevronLeft, IconChevronRight } from "../components/Icons";
 import { cat } from "../constants";
 import { todayStr, yesterdayStr, fmtDate, fmtAmt } from "../utils";
 
-const PAGE_SIZE = 20;
-
 export default function AllScreen({ expenses, theme, isDark, t, lang, curr, onEdit, onDelete }) {
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [loading, setLoading] = useState(false);
+  const now = new Date();
+  const [selYear, setSelYear] = useState(now.getFullYear());
+  const [selMonth, setSelMonth] = useState(now.getMonth());
   const [expandedId, setExpandedId] = useState(null);
-  const scrollRef = useRef(null);
   const fmt = (n) => fmtAmt(n, curr.symbol, lang, curr.code);
   const catColor = (id) => isDark ? cat(id).colorDark : cat(id).colorLight;
+  const isRTL = lang === "ar";
 
-  const sorted = [...expenses].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
-  const visible = sorted.slice(0, visibleCount);
-  const hasMore = visibleCount < sorted.length;
+  // Available months from expenses
+  const availableMonths = useMemo(() => {
+    const set = new Set();
+    expenses.forEach(e => {
+      const [y, m] = e.date.split("-");
+      set.add(`${y}-${m}`);
+    });
+    // Always include current month
+    set.add(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`);
+    return set;
+  }, [expenses]);
 
-  // Group visible expenses by date
+  // Filter expenses for selected month
+  const monthExp = useMemo(() => {
+    return expenses.filter(e => {
+      const d = new Date(e.date);
+      return d.getMonth() === selMonth && d.getFullYear() === selYear;
+    });
+  }, [expenses, selMonth, selYear]);
+
+  const monthTotal = monthExp.reduce((s, e) => s + Number(e.amount), 0);
+
+  // Sort and group by date
+  const sorted = [...monthExp].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
   const grouped = [];
   const seen = {};
-  visible.forEach(e => {
+  sorted.forEach(e => {
     if (!seen[e.date]) { seen[e.date] = true; grouped.push({ date: e.date, items: [] }); }
     grouped.find(g => g.date === e.date).items.push(e);
   });
 
-  const handleScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el || loading || !hasMore) return;
-    if (el.scrollHeight - el.scrollTop - el.clientHeight < 200) {
-      setLoading(true);
-      setTimeout(() => {
-        setVisibleCount(v => v + PAGE_SIZE);
-        setLoading(false);
-      }, 300);
-    }
-  }, [loading, hasMore]);
+  const goMonth = (dir) => {
+    setExpandedId(null);
+    let m = selMonth + dir;
+    let y = selYear;
+    if (m > 11) { m = 0; y++; }
+    if (m < 0) { m = 11; y--; }
+    setSelMonth(m);
+    setSelYear(y);
+  };
+
+  const isCurrentMonth = selMonth === now.getMonth() && selYear === now.getFullYear();
+  const monthLabel = `${t.months[selMonth]} ${selYear}`;
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <GlowBg theme={theme} style={{ position: "fixed" }} />
 
       {/* Header */}
-      <div style={{ padding: "56px 24px 16px", flexShrink: 0, position: "relative", zIndex: 1, background: theme.bg }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+      <div style={{ padding: "56px 24px 0", flexShrink: 0, position: "relative", zIndex: 1, background: theme.bg }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
           <IconList size={24} color={theme.text} />
           <h2 style={{ margin: 0, fontWeight: 900, fontSize: 26, color: theme.text }}>
             {t.allExpenses}
           </h2>
         </div>
-        <div style={{ fontSize: 13, color: theme.textMuted, marginLeft: 34 }}>
-          {sorted.length} {t.transactions}
+
+        {/* Month switcher */}
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          background: theme.glass,
+          border: `1px solid ${theme.glassBorder}`,
+          borderRadius: 16, padding: "6px 6px",
+          backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+          marginBottom: 16,
+        }}>
+          <button onClick={() => goMonth(isRTL ? 1 : -1)} style={{
+            width: 38, height: 38, borderRadius: 12,
+            background: theme.glassBg2,
+            border: `1px solid ${theme.glassBorder}`,
+            cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            {isRTL
+              ? <IconChevronRight size={18} color={theme.text} />
+              : <IconChevronLeft size={18} color={theme.text} />}
+          </button>
+
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: theme.text }}>
+              {monthLabel}
+            </div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: theme.accent1, marginTop: 2 }}>
+              {fmt(monthTotal)} · {sorted.length} {t.transactions}
+            </div>
+          </div>
+
+          <button onClick={() => goMonth(isRTL ? -1 : 1)} style={{
+            width: 38, height: 38, borderRadius: 12,
+            background: isCurrentMonth ? "transparent" : theme.glassBg2,
+            border: `1px solid ${isCurrentMonth ? "transparent" : theme.glassBorder}`,
+            cursor: isCurrentMonth ? "default" : "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            opacity: isCurrentMonth ? 0.25 : 1,
+            pointerEvents: isCurrentMonth ? "none" : "auto",
+          }}>
+            {isRTL
+              ? <IconChevronLeft size={18} color={theme.text} />
+              : <IconChevronRight size={18} color={theme.text} />}
+          </button>
         </div>
       </div>
 
       {/* Scrollable list */}
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        style={{ flex: 1, overflowY: "auto", padding: "0 16px", paddingBottom: 100, position: "relative", zIndex: 1 }}
-      >
+      <div style={{ flex: 1, overflowY: "auto", padding: "0 16px", paddingBottom: 100, position: "relative", zIndex: 1 }}>
         {grouped.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px 24px", color: theme.textMuted }}>
             <div style={{
@@ -178,13 +235,6 @@ export default function AllScreen({ expenses, theme, isDark, t, lang, curr, onEd
             })}
           </div>
         ))}
-
-        {/* Loading indicator */}
-        {loading && (
-          <div style={{ textAlign: "center", padding: "16px 0", color: theme.textMuted, fontSize: 13, fontWeight: 600 }}>
-            {t.loadingMore}
-          </div>
-        )}
       </div>
     </div>
   );
