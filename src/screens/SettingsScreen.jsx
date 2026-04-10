@@ -1,7 +1,7 @@
 import { useState } from "react";
 import GlassCard from "../components/GlassCard";
 import GlowBg from "../components/GlowBg";
-import { IconSettings, IconGlobe, IconMoon, IconSun, IconCoin, IconWallet, IconBell, IconTrash, IconBook, IconChevronRight, IconChevronLeft } from "../components/Icons";
+import { IconSettings, IconGlobe, IconMoon, IconSun, IconCoin, IconWallet, IconBell, IconTrash, IconBook, IconChevronRight, IconChevronLeft, IconCalendar } from "../components/Icons";
 import { CURRENCIES } from "../constants";
 
 function Section({ title, icon, children, theme }) {
@@ -88,6 +88,19 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, l
             options={CURRENCIES.map(c => ({ value: c.code, label: `${c.symbol} ${c.code}` }))}
             value={settings.currency}
             onChange={v => set("currency", v)}
+          />
+        </Section>
+
+        <Section title={t.weekStart} icon={<IconCalendar size={14} color={theme.textMuted} />} theme={theme}>
+          <ToggleGroup
+            theme={theme}
+            options={[
+              { value: 6, label: t.saturday },
+              { value: 0, label: t.sunday },
+              { value: 1, label: t.monday },
+            ]}
+            value={settings.weekStart ?? 1}
+            onChange={v => set("weekStart", v)}
           />
         </Section>
 

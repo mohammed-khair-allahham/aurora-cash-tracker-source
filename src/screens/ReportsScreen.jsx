@@ -4,7 +4,7 @@ import GlassCard from "../components/GlassCard";
 import GlowBg from "../components/GlowBg";
 import { IconChart, IconChevronLeft, IconChevronRight } from "../components/Icons";
 import { CATEGORIES } from "../constants";
-import { todayStr, fmtAmt, getDaysInMonth, getMondayStr, fmtShortDate } from "../utils";
+import { todayStr, fmtAmt, getDaysInMonth, getWeekStartStr, fmtShortDate } from "../utils";
 
 function ChartTooltip({ active, payload, theme, fmt }) {
   if (!active || !payload?.length) return null;
@@ -29,7 +29,8 @@ export default function ReportsScreen({ expenses, settings, theme, isDark, t, la
     return d.getMonth() === month && d.getFullYear() === year;
   });
   const monthTotal = monthExp.reduce((s, e) => s + Number(e.amount), 0);
-  const mondayStr = getMondayStr();
+  const weekStartDay = settings.weekStart ?? 1;
+  const mondayStr = getWeekStartStr(weekStartDay);
   const todayS = todayStr();
   const weekExp = expenses.filter(e => e.date >= mondayStr && e.date <= todayS);
   const weekTotal = weekExp.reduce((s, e) => s + Number(e.amount), 0);

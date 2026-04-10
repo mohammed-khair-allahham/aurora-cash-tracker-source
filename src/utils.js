@@ -32,10 +32,10 @@ export function getDaysInMonth(y, m) {
   return new Date(y, m + 1, 0).getDate();
 }
 
-export function getMondayStr() {
+export function getWeekStartStr(startDay = 1) {
   const d = new Date();
   const day = d.getDay();
-  const diff = day === 0 ? 6 : day - 1;
+  const diff = (day - startDay + 7) % 7;
   d.setDate(d.getDate() - diff);
   return d.toISOString().split("T")[0];
 }
