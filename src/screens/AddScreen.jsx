@@ -2,10 +2,10 @@ import { useState } from "react";
 import GlassCard from "../components/GlassCard";
 import GlowBg from "../components/GlowBg";
 import { IconChevronLeft, IconChevronRight } from "../components/Icons";
-import { CATEGORIES, cat } from "../constants";
+import { CATEGORIES, CURRENCIES, cat } from "../constants";
 import { todayStr } from "../utils";
 
-export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSave, onCancel, subcategories, onAddSubcategory }) {
+export default function AddScreen({ theme, isDark, t, lang, curr, editing, wallets, activeWalletId, onSave, onCancel, subcategories, onAddSubcategory }) {
   const [amount,      setAmount]      = useState(editing?.amount?.toString() || "");
   const [category,    setCategory]    = useState(editing?.category || "food");
   const [subcategory, setSubcategory] = useState(editing?.subcategory || "");
@@ -13,6 +13,10 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
   const [date,        setDate]        = useState(editing?.date || todayStr());
   const [newSubInput, setNewSubInput] = useState("");
   const [amountFocused, setAmountFocused] = useState(false);
+  const [walletId,    setWalletId]    = useState(editing?.walletId || activeWalletId || wallets[0]?.id);
+
+  const selectedWallet = wallets.find(w => w.id === walletId) || wallets[0];
+  const activeCurr = CURRENCIES.find(c => c.code === selectedWallet?.currency) || curr;
 
   const valid = amount && !isNaN(Number(amount)) && Number(amount) > 0;
   const selColor = isDark ? cat(category).colorDark : cat(category).colorLight;
@@ -65,10 +69,37 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
           </h2>
         </div>
 
+        {/* Wallet picker */}
+        {wallets.length > 1 && (
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10 }}>
+              {t.wallet}
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {wallets.map(w => {
+                const wCurr = CURRENCIES.find(c => c.code === w.currency);
+                const active = walletId === w.id;
+                return (
+                  <button key={w.id} onClick={() => setWalletId(w.id)} style={{
+                    padding: "9px 16px", borderRadius: 20,
+                    background: active ? theme.btnGrad : theme.glass,
+                    border: active ? "none" : `1px solid ${theme.glassBorder}`,
+                    color: active ? "#fff" : theme.textSub,
+                    fontSize: 13, fontWeight: 700, cursor: "pointer",
+                    fontFamily: "inherit", backdropFilter: "blur(12px)",
+                  }}>
+                    {w.name} · {wCurr?.symbol}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Amount */}
         <GlassCard theme={theme} variant="elevated" style={{ padding: "22px 20px", marginBottom: 18, textAlign: "center" }}>
           <div style={{ fontSize: 12, fontWeight: 600, color: theme.textSub, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 14 }}>
-            {t.amount} · {curr.code}
+            {t.amount} · {activeCurr.code}
           </div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
             {/* −10 stepper */}
@@ -88,7 +119,7 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
 
             {/* Currency + input */}
             <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
-              <span style={{ fontSize: 24, fontWeight: 800, color: theme.textMuted }}>{curr.symbol}</span>
+              <span style={{ fontSize: 24, fontWeight: 800, color: theme.textMuted }}>{activeCurr.symbol}</span>
               <input
                 type="text" inputMode="decimal" value={amount}
                 onChange={e => {
@@ -236,7 +267,7 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
         zIndex: 200,
       }}>
         <button
-          onClick={() => valid && onSave({ amount: Number(amount), category, subcategory: subcategory || undefined, note, date })}
+          onClick={() => valid && onSave({ amount: Number(amount), category, subcategory: subcategory || undefined, note, date, walletId: walletId || wallets[0]?.id })}
           style={{
             width: "100%", padding: "17px",
             background: valid ? theme.btnGrad : theme.glass,

@@ -5,7 +5,7 @@ import { IconWallet, IconEdit, IconTrash } from "../components/Icons";
 import { cat } from "../constants";
 import { todayStr, fmtAmt, ls, lsSet } from "../utils";
 
-export default function HomeScreen({ expenses, settings, theme, isDark, t, lang, curr, notif, onRequestNotif, onEdit, onDelete }) {
+export default function HomeScreen({ expenses, settings, wallets, theme, isDark, t, lang, curr, notif, onRequestNotif, onEdit, onDelete, onSetActiveWallet }) {
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
@@ -15,20 +15,36 @@ export default function HomeScreen({ expenses, settings, theme, isDark, t, lang,
   const fmt = (n) => fmtAmt(n, curr.symbol, lang, curr.code);
   const catColor = (id) => isDark ? cat(id).colorDark : cat(id).colorLight;
 
-  const todayExp = expenses.filter(e => e.date === todayStr());
+  // Active wallet
+  const activeWallet = wallets.find(w => w.id === settings.activeWalletId) || wallets[0];
+  const walletBalance = activeWallet?.balance || 0;
+
+  // Wallet switcher: cycle to next wallet
+  const switchWallet = () => {
+    if (!wallets.length) return;
+    const idx = wallets.findIndex(w => w.id === activeWallet?.id);
+    const next = wallets[(idx + 1) % wallets.length];
+    onSetActiveWallet(next.id);
+  };
+
+  // Filter today/month expenses by active wallet
+  const todayExp = expenses.filter(e => e.date === todayStr() && e.walletId === activeWallet?.id);
   const todayTotal = todayExp.reduce((s, e) => s + Number(e.amount), 0);
 
   // Wallet & budget
-  const walletBalance = settings.walletBalance || 0;
   const budget = settings.monthlyBudget || 0;
   const now = new Date();
   const monthSpent = expenses
-    .filter(e => { const d = new Date(e.date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); })
+    .filter(e => {
+      const d = new Date(e.date);
+      return e.walletId === activeWallet?.id &&
+        d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    })
     .reduce((s, e) => s + Number(e.amount), 0);
   const budgetRemaining = budget - monthSpent;
   const budgetPct = budget > 0 ? Math.min((monthSpent / budget) * 100, 100) : 0;
 
-  // Category totals for today
+  // Category totals for today (already filtered by active wallet above)
   const todayCats = Object.entries(
     todayExp.reduce((acc, e) => { acc[e.category] = (acc[e.category] || 0) + Number(e.amount); return acc; }, {})
   );
@@ -134,11 +150,28 @@ export default function HomeScreen({ expenses, settings, theme, isDark, t, lang,
 
           <div style={{ padding: "18px 20px 0" }}>
             {/* Wallet header row */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-              <IconWallet size={15} color={theme.textMuted} />
-              <span style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase" }}>
-                {t.walletBalance}
-              </span>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 14 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <IconWallet size={15} color={theme.textMuted} />
+                <span style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase" }}>
+                  {t.walletBalance}
+                </span>
+              </div>
+              {wallets.length > 1 && (
+                <button onClick={switchWallet} style={{
+                  background: isDark ? "rgba(0,229,160,0.10)" : "rgba(5,150,105,0.07)",
+                  border: `1px solid ${isDark ? "rgba(0,229,160,0.2)" : "rgba(5,150,105,0.15)"}`,
+                  borderRadius: 10, padding: "4px 10px",
+                  color: theme.accent1, fontSize: 11, fontWeight: 700,
+                  cursor: "pointer", fontFamily: "inherit",
+                  display: "flex", alignItems: "center", gap: 4,
+                }}>
+                  {activeWallet?.name} ↻
+                </button>
+              )}
+              {wallets.length === 1 && activeWallet && (
+                <span style={{ fontSize: 11, fontWeight: 600, color: theme.textMuted }}>{activeWallet.name}</span>
+              )}
             </div>
 
             {/* Balance + budget ring row */}

@@ -5,34 +5,25 @@ import { IconList, IconEdit, IconTrash, IconChevronLeft, IconChevronRight } from
 import { cat } from "../constants";
 import { todayStr, yesterdayStr, fmtDate, fmtAmt } from "../utils";
 
-export default function AllScreen({ expenses, theme, isDark, t, lang, curr, onEdit, onDelete }) {
+export default function AllScreen({ expenses, wallets, theme, isDark, t, lang, curr, onEdit, onDelete }) {
   const now = new Date();
   const [selYear, setSelYear] = useState(now.getFullYear());
   const [selMonth, setSelMonth] = useState(now.getMonth());
   const [expandedId, setExpandedId] = useState(null);
+  const [filterWalletId, setFilterWalletId] = useState("all");
   const fmt = (n) => fmtAmt(n, curr.symbol, lang, curr.code);
   const catColor = (id) => isDark ? cat(id).colorDark : cat(id).colorLight;
   const isRTL = lang === "ar";
 
-  // Available months from expenses
-  const availableMonths = useMemo(() => {
-    const set = new Set();
-    expenses.forEach(e => {
-      const [y, m] = e.date.split("-");
-      set.add(`${y}-${m}`);
-    });
-    // Always include current month
-    set.add(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`);
-    return set;
-  }, [expenses]);
-
-  // Filter expenses for selected month
+  // Filter expenses for selected month + wallet
   const monthExp = useMemo(() => {
     return expenses.filter(e => {
       const d = new Date(e.date);
-      return d.getMonth() === selMonth && d.getFullYear() === selYear;
+      const monthMatch = d.getMonth() === selMonth && d.getFullYear() === selYear;
+      const walletMatch = filterWalletId === "all" || e.walletId === filterWalletId;
+      return monthMatch && walletMatch;
     });
-  }, [expenses, selMonth, selYear]);
+  }, [expenses, selMonth, selYear, filterWalletId]);
 
   const monthTotal = monthExp.reduce((s, e) => s + Number(e.amount), 0);
 
@@ -115,6 +106,27 @@ export default function AllScreen({ expenses, theme, isDark, t, lang, curr, onEd
               : <IconChevronRight size={18} color={theme.text} />}
           </button>
         </div>
+        {/* Wallet filter pills (only when multiple wallets exist) */}
+        {wallets.length > 1 && (
+          <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 12, scrollbarWidth: "none" }}>
+            {[{ id: "all", name: t.all },...wallets].map(w => {
+              const active = filterWalletId === w.id;
+              return (
+                <button key={w.id} onClick={() => { setFilterWalletId(w.id); setExpandedId(null); }} style={{
+                  flexShrink: 0, padding: "7px 14px", borderRadius: 20,
+                  background: active ? theme.btnGrad : theme.glass,
+                  border: active ? "none" : `1px solid ${theme.glassBorder}`,
+                  color: active ? "#fff" : theme.textSub,
+                  fontSize: 12, fontWeight: 700, cursor: "pointer",
+                  fontFamily: "inherit", backdropFilter: "blur(12px)",
+                  whiteSpace: "nowrap",
+                }}>
+                  {w.name}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Scrollable list */}

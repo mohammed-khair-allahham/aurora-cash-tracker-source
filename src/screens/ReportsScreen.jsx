@@ -15,24 +15,27 @@ function ChartTooltip({ active, payload, theme, fmt }) {
   );
 }
 
-export default function ReportsScreen({ expenses, settings, theme, isDark, t, lang, curr }) {
+export default function ReportsScreen({ expenses, settings, wallets, theme, isDark, t, lang, curr }) {
   const fmt = (n) => fmtAmt(n, curr.symbol, lang, curr.code);
 
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth());
   const [year,  setYear]  = useState(now.getFullYear());
+  const [filterWalletId, setFilterWalletId] = useState(settings.activeWalletId || "all");
 
   const isCurrentMonth = month === now.getMonth() && year === now.getFullYear();
 
   const monthExp = expenses.filter(e => {
     const d = new Date(e.date);
-    return d.getMonth() === month && d.getFullYear() === year;
+    const monthMatch = d.getMonth() === month && d.getFullYear() === year;
+    const walletMatch = filterWalletId === "all" || e.walletId === filterWalletId;
+    return monthMatch && walletMatch;
   });
   const monthTotal = monthExp.reduce((s, e) => s + Number(e.amount), 0);
   const weekStartDay = settings.weekStart ?? 1;
   const mondayStr = getWeekStartStr(weekStartDay);
   const todayS = todayStr();
-  const weekExp = expenses.filter(e => e.date >= mondayStr && e.date <= todayS);
+  const weekExp = expenses.filter(e => e.date >= mondayStr && e.date <= todayS && (filterWalletId === "all" || e.walletId === filterWalletId));
   const weekTotal = weekExp.reduce((s, e) => s + Number(e.amount), 0);
 
   const catData = CATEGORIES.map(c => ({
@@ -91,6 +94,27 @@ export default function ReportsScreen({ expenses, settings, theme, isDark, t, la
             <NextIcon size={20} color={theme.text} />
           </button>
         </GlassCard>
+
+        {/* Wallet filter */}
+        {wallets.length > 1 && (
+          <div style={{ display: "flex", gap: 8, overflowX: "auto", marginBottom: 18, scrollbarWidth: "none" }}>
+            {[{ id: "all", name: t.all }, ...wallets].map(w => {
+              const active = filterWalletId === w.id;
+              return (
+                <button key={w.id} onClick={() => setFilterWalletId(w.id)} style={{
+                  flexShrink: 0, padding: "7px 14px", borderRadius: 20,
+                  background: active ? theme.btnGrad : theme.glass,
+                  border: active ? "none" : `1px solid ${theme.glassBorder}`,
+                  color: active ? "#fff" : theme.textSub,
+                  fontSize: 12, fontWeight: 700, cursor: "pointer",
+                  fontFamily: "inherit", backdropFilter: "blur(12px)", whiteSpace: "nowrap",
+                }}>
+                  {w.name}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {/* Summary cards */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 18 }}>
