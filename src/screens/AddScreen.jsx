@@ -48,7 +48,7 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", position: "relative" }}>
       <GlowBg theme={theme} />
-      <div style={{ flex: 1, overflowY: "auto", padding: "52px 20px 20px", position: "relative", zIndex: 1 }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "52px 20px 100px", position: "relative", zIndex: 1 }}>
 
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
@@ -194,7 +194,10 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
         backdropFilter: "blur(32px)",
         WebkitBackdropFilter: "blur(32px)",
         borderTop: `1px solid ${theme.glassBorder}`,
-        position: "relative", zIndex: 10,
+        position: "fixed", bottom: 0,
+        left: "50%", transform: "translateX(-50%)",
+        width: "100%", maxWidth: 430,
+        zIndex: 200,
       }}>
         <button
           onClick={() => valid && onSave({ amount: Number(amount), category, subcategory: subcategory || undefined, note, date })}
