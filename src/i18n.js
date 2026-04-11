@@ -103,6 +103,10 @@ const T = {
     welcomeTitle: "Welcome to Aurora",
     welcomeSubtitle: "Your personal cash tracker. Here's a quick guide to get you started.",
     getStarted: "Get Started",
+    next: "Next",
+    back: "Back",
+    skip: "Skip",
+    finish: "Finish",
     cats: {
       food: "Food", transport: "Transport", groceries: "Groceries",
       entertainment: "Entertainment", health: "Health", home: "Home",
@@ -214,6 +218,10 @@ const T = {
     welcomeTitle: "مرحباً بك في أورورا",
     welcomeSubtitle: "متتبع نقودك الشخصي. إليك دليل سريع للبدء.",
     getStarted: "ابدأ الآن",
+    next: "التالي",
+    back: "السابق",
+    skip: "تخطي",
+    finish: "إنهاء",
     cats: {
       food: "طعام", transport: "مواصلات", groceries: "بقالة",
       entertainment: "ترفيه", health: "صحة", home: "منزل",

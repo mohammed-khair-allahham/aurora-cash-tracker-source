@@ -23,6 +23,7 @@ export default function App() {
     ...ls("ct_settings", {}),
   }));
   const [editingId, setEditingId] = useState(null);
+  const [guideOpen, setGuideOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => !ls("ct_onboarded", false));
   const [subcategories, setSubcategories] = useState(() => ls("ct_subcategories", {}));
   const [notif,     setNotif]     = useState(
@@ -176,19 +177,8 @@ export default function App() {
         }
       `}</style>
 
-      {/* First-time onboarding */}
-      {showOnboarding && (
-        <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", animation: "fadeSlideIn 0.25s ease-out" }}>
-          <GuideScreen
-            {...commonProps}
-            onboarding
-            onFinish={() => { lsSet("ct_onboarded", true); setShowOnboarding(false); }}
-          />
-        </div>
-      )}
-
       {/* Screen content with fade-slide transition */}
-      {!showOnboarding && <div key={screen} style={{
+      <div key={screen} style={{
         flex: 1, overflow: "hidden",
         display: "flex", flexDirection: "column",
         animation: "fadeSlideIn 0.25s ease-out",
@@ -248,19 +238,26 @@ export default function App() {
             notif={notif}
             onRequestNotif={requestNotif}
             onClear={() => { setExpenses([]); setWalletTxns([]); }}
-            onOpenGuide={() => setScreen(SCREENS.GUIDE)}
+            onOpenGuide={() => setGuideOpen(true)}
           />
         )}
-        {screen === SCREENS.GUIDE && (
-          <GuideScreen
-            {...commonProps}
-            onBack={() => setScreen(SCREENS.SETTINGS)}
-          />
-        )}
-      </div>}
+      </div>
+
+      {/* Guide overlay — onboarding or on-demand from settings */}
+      {(showOnboarding || guideOpen) && (
+        <GuideScreen
+          {...commonProps}
+          onboarding={showOnboarding}
+          onBack={() => setGuideOpen(false)}
+          onFinish={() => {
+            if (showOnboarding) { lsSet("ct_onboarded", true); setShowOnboarding(false); }
+            setGuideOpen(false);
+          }}
+        />
+      )}
 
       {/* FAB */}
-      {!showOnboarding && screen !== SCREENS.ADD && screen !== SCREENS.SETTINGS && screen !== SCREENS.GUIDE && (
+      {!showOnboarding && !guideOpen && screen !== SCREENS.ADD && screen !== SCREENS.SETTINGS && (
         <button onClick={() => handleNavigate(SCREENS.ADD)} style={{
           position: "fixed",
           bottom: 90,
@@ -279,7 +276,7 @@ export default function App() {
         </button>
       )}
 
-      {!showOnboarding && screen !== SCREENS.GUIDE && (
+      {!showOnboarding && (
         <BottomNav
           screen={screen}
           onNavigate={handleNavigate}
