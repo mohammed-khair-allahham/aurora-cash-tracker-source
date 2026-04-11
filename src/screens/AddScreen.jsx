@@ -189,7 +189,7 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
 
       {/* Sticky submit footer */}
       <div style={{
-        padding: "12px 20px 28px",
+        padding: "12px 20px max(28px, env(safe-area-inset-bottom, 28px))",
         background: theme.navBg,
         backdropFilter: "blur(32px)",
         WebkitBackdropFilter: "blur(32px)",

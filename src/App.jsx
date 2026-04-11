@@ -276,7 +276,7 @@ export default function App() {
         </button>
       )}
 
-      {!showOnboarding && (
+      {!showOnboarding && screen !== SCREENS.ADD && (
         <BottomNav
           screen={screen}
           onNavigate={handleNavigate}
