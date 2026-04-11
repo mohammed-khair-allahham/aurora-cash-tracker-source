@@ -67,25 +67,61 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, onSav
 
         {/* Amount */}
         <GlassCard theme={theme} variant="elevated" style={{ padding: "22px 20px", marginBottom: 18, textAlign: "center" }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: theme.textSub, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: theme.textSub, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 14 }}>
             {t.amount} · {curr.code}
           </div>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-            <span style={{ fontSize: 28, fontWeight: 800, color: theme.textMuted }}>{curr.symbol}</span>
-            <input
-              type="number" value={amount}
-              onChange={e => setAmount(e.target.value)}
-              onFocus={() => setAmountFocused(true)}
-              onBlur={() => setAmountFocused(false)}
-              placeholder="0"
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+            {/* −10 stepper */}
+            <button
+              onPointerDown={e => { e.preventDefault(); setAmount(v => Math.max(0, (parseFloat(v) || 0) - 10).toString()); }}
               style={{
-                background: "none", border: "none", outline: "none",
-                fontSize: lang === "ar" ? 44 : 50, fontWeight: 900,
-                color: valid ? selColor : theme.textSub,
-                width: "60%", textAlign: "center",
-                fontFamily: "inherit", transition: "color 0.2s",
+                flexShrink: 0,
+                width: 48, height: 48, borderRadius: 16,
+                background: theme.inputBg,
+                border: `1.5px solid ${theme.glassBorder}`,
+                color: theme.textSub, fontSize: 17, fontWeight: 800,
+                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "all 0.15s",
+                userSelect: "none",
               }}
-            />
+            >−10</button>
+
+            {/* Currency + input */}
+            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
+              <span style={{ fontSize: 24, fontWeight: 800, color: theme.textMuted }}>{curr.symbol}</span>
+              <input
+                type="text" inputMode="decimal" value={amount}
+                onChange={e => {
+                  const v = e.target.value;
+                  if (v === "" || /^\d*\.?\d*$/.test(v)) setAmount(v);
+                }}
+                onFocus={() => setAmountFocused(true)}
+                onBlur={() => setAmountFocused(false)}
+                placeholder="0"
+                style={{
+                  background: "none", border: "none", outline: "none",
+                  fontSize: lang === "ar" ? 40 : 46, fontWeight: 900,
+                  color: valid ? selColor : theme.textSub,
+                  width: "55%", textAlign: "center",
+                  fontFamily: "inherit", transition: "color 0.2s",
+                }}
+              />
+            </div>
+
+            {/* +10 stepper */}
+            <button
+              onPointerDown={e => { e.preventDefault(); setAmount(v => ((parseFloat(v) || 0) + 10).toString()); }}
+              style={{
+                flexShrink: 0,
+                width: 48, height: 48, borderRadius: 16,
+                background: valid ? selColor + "22" : theme.inputBg,
+                border: `1.5px solid ${valid ? selColor : theme.glassBorder}`,
+                color: valid ? selColor : theme.textSub, fontSize: 17, fontWeight: 800,
+                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "all 0.15s",
+                userSelect: "none",
+              }}
+            >+10</button>
           </div>
           {/* Animated focus underline */}
           <div style={{
