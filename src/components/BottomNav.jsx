@@ -61,7 +61,7 @@ export default function BottomNav({ screen, onNavigate, theme, t }) {
               />
               <span style={{
                 fontSize: 10, fontWeight: 600,
-                color: active ? theme.navIndicator : theme.textSub,
+                color: active ? theme.navIndicator : theme.navText,
                 opacity: active ? 1 : 0.5,
                 transition: "color 0.2s, opacity 0.2s",
               }}>
