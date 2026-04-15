@@ -23,6 +23,9 @@ export default function ReportsScreen({ expenses, settings, wallets, theme, isDa
   const [year,  setYear]  = useState(now.getFullYear());
   const [filterWalletId, setFilterWalletId] = useState(settings.activeWalletId || "all");
 
+  const filterWallet = wallets.find(w => w.id === filterWalletId) || null;
+  const walletBudget = filterWallet?.budget || 0;
+
   const isCurrentMonth = month === now.getMonth() && year === now.getFullYear();
 
   const monthExp = expenses.filter(e => {
@@ -63,11 +66,11 @@ export default function ReportsScreen({ expenses, settings, wallets, theme, isDa
     const daysRemaining = daysInMonth - dayOfMonth;
     const dailyAvg = monthTotal / dayOfMonth;
     const projected = dailyAvg * daysInMonth;
-    const budget = settings.monthlyBudget || 0;
+    const budget = walletBudget;
     const projectedVsBudget = budget > 0 ? projected - budget : null;
     const pct = budget > 0 ? Math.min((projected / budget) * 100, 150) : 0;
     return { dayOfMonth, daysInMonth, daysRemaining, dailyAvg, projected, budget, projectedVsBudget, pct };
-  }, [isCurrentMonth, monthTotal, month, year, settings.monthlyBudget]);
+  }, [isCurrentMonth, monthTotal, month, year, walletBudget]);
 
   const prevMonth = () => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); };
   const nextMonth = () => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); };
@@ -122,8 +125,8 @@ export default function ReportsScreen({ expenses, settings, wallets, theme, isDa
             <div style={{ fontSize: 11, color: theme.textSub, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>{t.monthlyTotal}</div>
             <div style={{ fontSize: 22, fontWeight: 900, background: theme.totalGrad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{fmt(monthTotal)}</div>
             <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4 }}>{monthExp.length} {t.transactions}</div>
-            {(settings.monthlyBudget || 0) > 0 && (() => {
-              const rem = (settings.monthlyBudget || 0) - monthTotal;
+            {walletBudget > 0 && (() => {
+              const rem = walletBudget - monthTotal;
               return (
                 <div style={{ fontSize: 11, color: rem >= 0 ? theme.accent1 : "#ef4444", marginTop: 4, fontWeight: 600 }}>
                   {rem >= 0 ? t.remaining : t.overBudget}: {fmt(Math.abs(rem))}

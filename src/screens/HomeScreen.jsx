@@ -31,8 +31,8 @@ export default function HomeScreen({ expenses, settings, wallets, theme, isDark,
   const todayExp = expenses.filter(e => e.date === todayStr() && e.walletId === activeWallet?.id);
   const todayTotal = todayExp.reduce((s, e) => s + Number(e.amount), 0);
 
-  // Wallet & budget
-  const budget = settings.monthlyBudget || 0;
+  // Wallet & budget (per active wallet)
+  const budget = activeWallet?.budget || 0;
   const now = new Date();
   const monthSpent = expenses
     .filter(e => {

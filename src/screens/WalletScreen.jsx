@@ -7,7 +7,7 @@ import { fmtAmt, todayStr, fmtDate } from "../utils";
 
 export default function WalletScreen({
   expenses, settings, walletTxns, wallets,
-  onTopUp, onDeleteTopUp, onAddWallet, onDeleteWallet, onSetActiveWallet, onSettingsChange,
+  onTopUp, onDeleteTopUp, onAddWallet, onDeleteWallet, onSetActiveWallet, onUpdateWallet,
   theme, isDark, t, lang,
 }) {
   const [selectedId, setSelectedId] = useState(settings.activeWalletId || wallets[0]?.id);
@@ -297,14 +297,14 @@ export default function WalletScreen({
           </GlassCard>
         )}
 
-        {/* Monthly budget */}
+        {/* Monthly budget (per selected wallet) */}
         <GlassCard theme={theme} style={{ padding: "12px 16px", marginBottom: 14 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: theme.textSub }}>{t.monthlyBudget}</div>
             <input
               type="number"
-              value={settings.monthlyBudget || ""}
-              onChange={e => onSettingsChange(s => ({ ...s, monthlyBudget: e.target.value === "" ? 0 : Number(e.target.value) }))}
+              value={selectedWallet?.budget || ""}
+              onChange={e => onUpdateWallet(selectedWallet.id, { budget: e.target.value === "" ? 0 : Number(e.target.value) })}
               placeholder="0"
               style={{
                 width: 120, boxSizing: "border-box",

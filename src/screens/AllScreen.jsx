@@ -2,16 +2,25 @@ import { useState, useMemo } from "react";
 import GlassCard from "../components/GlassCard";
 import GlowBg from "../components/GlowBg";
 import { IconList, IconEdit, IconTrash, IconChevronLeft, IconChevronRight } from "../components/Icons";
-import { cat } from "../constants";
+import { cat, CURRENCIES } from "../constants";
 import { todayStr, yesterdayStr, fmtDate, fmtAmt } from "../utils";
 
-export default function AllScreen({ expenses, wallets, theme, isDark, t, lang, curr, onEdit, onDelete }) {
+export default function AllScreen({ expenses, settings, wallets, theme, isDark, t, lang, curr, onEdit, onDelete }) {
   const now = new Date();
   const [selYear, setSelYear] = useState(now.getFullYear());
   const [selMonth, setSelMonth] = useState(now.getMonth());
   const [expandedId, setExpandedId] = useState(null);
-  const [filterWalletId, setFilterWalletId] = useState("all");
-  const fmt = (n) => fmtAmt(n, curr.symbol, lang, curr.code);
+  const [filterWalletId, setFilterWalletId] = useState(settings?.activeWalletId || wallets[0]?.id || "all");
+  const walletCurrFor = (walletId) => {
+    const w = wallets.find(x => x.id === walletId);
+    return CURRENCIES.find(c => c.code === w?.currency) || curr;
+  };
+  const filterCurr = filterWalletId === "all" ? curr : walletCurrFor(filterWalletId);
+  const fmt = (n) => fmtAmt(n, filterCurr.symbol, lang, filterCurr.code);
+  const fmtExp = (exp) => {
+    const c = filterWalletId === "all" ? walletCurrFor(exp.walletId) : filterCurr;
+    return fmtAmt(exp.amount, c.symbol, lang, c.code);
+  };
   const catColor = (id) => isDark ? cat(id).colorDark : cat(id).colorLight;
   const isRTL = lang === "ar";
 
@@ -203,7 +212,7 @@ export default function AllScreen({ expenses, wallets, theme, isDark, t, lang, c
                     </div>
 
                     <div style={{ textAlign: lang === "ar" ? "left" : "right", flexShrink: 0 }}>
-                      <div style={{ fontWeight: 800, fontSize: 15, color }}>{fmt(exp.amount)}</div>
+                      <div style={{ fontWeight: 800, fontSize: 15, color }}>{fmtExp(exp)}</div>
                     </div>
                   </div>
 

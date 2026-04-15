@@ -24,24 +24,37 @@ export default function App() {
 
   // ── Multi-wallet migration (runs once in initializer, before other state) ──
   const [wallets, setWallets] = useState(() => {
+    const saved = ls("ct_settings", {});
     if (ls("ct_wallets", null) === null) {
-      const saved = ls("ct_settings", {});
       const defaultWallet = {
         id: "w1",
         name: saved.lang === "ar" ? "المحفظة الرئيسية" : "Main Wallet",
         currency: saved.currency || "SYP",
         balance: saved.walletBalance || 0,
+        budget: saved.monthlyBudget || 0,
       };
       // Backfill walletId on existing data
       lsSet("ct_expenses", (ls("ct_expenses", []) || []).map(e => e.walletId ? e : { ...e, walletId: "w1" }));
       lsSet("ct_wallet_txns", (ls("ct_wallet_txns", []) || []).map(t => t.walletId ? t : { ...t, walletId: "w1" }));
       // Strip old single-wallet fields from settings
-      const { walletBalance: _wb, currency: _c, ...clean } = saved;
+      const { walletBalance: _wb, currency: _c, monthlyBudget: _mb, ...clean } = saved;
       lsSet("ct_settings", { ...clean, activeWalletId: "w1" });
       lsSet("ct_wallets", [defaultWallet]);
       return [defaultWallet];
     }
-    return ls("ct_wallets", []);
+    // Post-migration fold: older versions stored budget on settings.
+    const existing = ls("ct_wallets", []);
+    if (saved.monthlyBudget !== undefined) {
+      const activeId = saved.activeWalletId || existing[0]?.id;
+      const migrated = existing.map(w =>
+        w.id === activeId ? { ...w, budget: w.budget ?? saved.monthlyBudget } : w
+      );
+      const { monthlyBudget: _mb, ...clean } = saved;
+      lsSet("ct_settings", clean);
+      lsSet("ct_wallets", migrated);
+      return migrated;
+    }
+    return existing;
   });
 
   const [expenses,  setExpenses]  = useState(() => ls("ct_expenses", []));
@@ -219,6 +232,10 @@ export default function App() {
 
   const setActiveWallet = (id) => {
     setSettings(s => ({ ...s, activeWalletId: id }));
+  };
+
+  const updateWallet = (id, patch) => {
+    setWallets(prev => prev.map(w => w.id === id ? { ...w, ...patch } : w));
   };
 
   // ── Navigation ──
@@ -421,12 +438,13 @@ export default function App() {
             onAddWallet={addWallet}
             onDeleteWallet={deleteWallet}
             onSetActiveWallet={setActiveWallet}
-            onSettingsChange={setSettings}
+            onUpdateWallet={updateWallet}
           />
         )}
         {screen === SCREENS.ALL && (
           <AllScreen
             {...commonProps}
+            settings={settings}
             expenses={expenses}
             wallets={wallets}
             onEdit={startEdit}

@@ -89,7 +89,7 @@ export default function LockScreen({ theme, isDark, t, onUnlock, onReset }) {
         {/* Numpad */}
         <div style={{
           display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12,
-          marginBottom: 28,
+          marginBottom: 28, direction: "ltr",
         }}>
           {KEYS.map((key, idx) => (
             <button
