@@ -1,6 +1,5 @@
 import { useState } from "react";
 import GlassCard from "../components/GlassCard";
-import GlowBg from "../components/GlowBg";
 import { IconWallet, IconArrowUp, IconPlus, IconTrash } from "../components/Icons";
 import { CURRENCIES } from "../constants";
 import { fmtAmt, todayStr, fmtDate } from "../utils";
@@ -53,7 +52,6 @@ export default function WalletScreen({
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <GlowBg theme={theme} style={{ position: "fixed" }} />
 
       {/* Header */}
       <div style={{ padding: "56px 24px 16px", flexShrink: 0, position: "relative", zIndex: 1, background: theme.bg }}>
@@ -74,11 +72,11 @@ export default function WalletScreen({
                 onClick={() => { setSelectedId(w.id); setShowTopUp(false); setExpandedId(null); }}
                 style={{
                   flexShrink: 0, padding: "8px 16px", borderRadius: 20,
-                  background: active ? theme.btnGrad : theme.glass,
-                  border: active ? "none" : `1px solid ${theme.glassBorder}`,
+                  background: active ? theme.accent1 : theme.surface,
+                  border: `1px solid ${active ? theme.accent1 : theme.border}`,
                   color: active ? "#fff" : theme.textSub,
-                  fontSize: 13, fontWeight: 700, cursor: "pointer",
-                  fontFamily: "inherit", backdropFilter: "blur(12px)",
+                  fontSize: 13, fontWeight: 600, cursor: "pointer",
+                  fontFamily: "inherit",
                   display: "flex", alignItems: "center", gap: 6,
                   whiteSpace: "nowrap",
                 }}
@@ -95,7 +93,7 @@ export default function WalletScreen({
             onClick={() => setShowAddWallet(v => !v)}
             style={{
               flexShrink: 0, width: 36, height: 36, borderRadius: 12,
-              background: theme.glass, border: `1px solid ${theme.glassBorder}`,
+              background: theme.surface, border: `1px solid ${theme.border}`,
               color: theme.accent1, fontSize: 20, cursor: "pointer",
               display: "flex", alignItems: "center", justifyContent: "center",
             }}
@@ -128,10 +126,10 @@ export default function WalletScreen({
                   onClick={() => setNewWalletCurrency(c.code)}
                   style={{
                     flex: 1, padding: "10px 8px", borderRadius: 12,
-                    background: newWalletCurrency === c.code ? theme.btnGrad : theme.glass,
-                    border: newWalletCurrency === c.code ? "none" : `1px solid ${theme.glassBorder}`,
+                    background: newWalletCurrency === c.code ? theme.accent1 : theme.surface,
+                    border: `1px solid ${newWalletCurrency === c.code ? theme.accent1 : theme.border}`,
                     color: newWalletCurrency === c.code ? "#fff" : theme.textSub,
-                    fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                    fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                   }}
                 >
                   {c.symbol} {c.code}
@@ -140,14 +138,14 @@ export default function WalletScreen({
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={() => setShowAddWallet(false)} style={{
-                flex: 1, padding: "10px", background: theme.glass,
-                border: `1px solid ${theme.glassBorder}`, borderRadius: 10,
+                flex: 1, padding: "10px", background: theme.surface2,
+                border: `1px solid ${theme.border}`, borderRadius: 10,
                 color: theme.text, cursor: "pointer", fontFamily: "inherit", fontWeight: 600, fontSize: 13,
               }}>{t.cancel}</button>
               <button onClick={handleAddWallet} style={{
-                flex: 1, padding: "10px", background: theme.btnGrad,
+                flex: 1, padding: "10px", background: theme.accent1,
                 border: "none", borderRadius: 10, color: "#fff",
-                cursor: "pointer", fontFamily: "inherit", fontWeight: 700, fontSize: 13,
+                cursor: "pointer", fontFamily: "inherit", fontWeight: 600, fontSize: 13,
               }}>{t.addWallet}</button>
             </div>
           </GlassCard>
@@ -155,83 +153,78 @@ export default function WalletScreen({
 
         {/* Selected wallet balance card */}
         {selectedWallet && (
-          <GlassCard theme={theme} variant="wallet" style={{ padding: 0, marginBottom: 12, overflow: "hidden" }}>
-            <div style={{ height: 3, background: theme.walletAccent }} />
-            <div style={{ padding: "16px 20px" }}>
-              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 12 }}>
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>
-                    {selectedWallet.name}
-                  </div>
-                  <div style={{
-                    fontSize: 34, fontWeight: 900, lineHeight: 1.1,
-                    color: (selectedWallet.balance || 0) >= 0 ? theme.accent1 : "#ef4444",
-                  }}>
-                    {fmt(selectedWallet.balance || 0)}
-                  </div>
+          <GlassCard theme={theme} style={{ padding: "16px 20px", marginBottom: 12 }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 12 }}>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: theme.textMuted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>
+                  {selectedWallet.name}
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
-                  {!isActive && (
-                    <button onClick={() => onSetActiveWallet(selectedWallet.id)} style={{
-                      padding: "6px 12px", borderRadius: 10,
-                      background: isDark ? "rgba(0,229,160,0.12)" : "rgba(5,150,105,0.08)",
-                      border: `1px solid ${isDark ? "rgba(0,229,160,0.25)" : "rgba(5,150,105,0.2)"}`,
-                      color: theme.accent1, fontSize: 11, fontWeight: 700, cursor: "pointer",
-                      fontFamily: "inherit", whiteSpace: "nowrap",
-                    }}>
-                      ✓ {t.setActive}
-                    </button>
-                  )}
-                  {isActive && (
-                    <span style={{
-                      padding: "5px 10px", borderRadius: 10, fontSize: 11, fontWeight: 700,
-                      color: theme.accent1,
-                      background: isDark ? "rgba(0,229,160,0.10)" : "rgba(5,150,105,0.07)",
-                      border: `1px solid ${isDark ? "rgba(0,229,160,0.2)" : "rgba(5,150,105,0.15)"}`,
-                    }}>✓ {t.activeWallet}</span>
-                  )}
-                  <button
-                    onClick={() => canDelete && onDeleteWallet(selectedWallet.id)}
-                    title={!canDelete ? t.cannotDeleteWallet : t.deleteWallet}
-                    style={{
-                      padding: "5px 10px", borderRadius: 10,
-                      background: canDelete
-                        ? (isDark ? "rgba(239,68,68,0.10)" : "rgba(239,68,68,0.07)")
-                        : "transparent",
-                      border: canDelete ? "1px solid rgba(239,68,68,0.25)" : `1px solid ${theme.glassBorder}`,
-                      color: canDelete ? "#ef4444" : theme.textMuted,
-                      fontSize: 11, fontWeight: 600, cursor: canDelete ? "pointer" : "not-allowed",
-                      fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4,
-                    }}
-                  >
-                    <IconTrash size={12} color={canDelete ? "#ef4444" : theme.textMuted} />
-                    {t.deleteWallet}
-                  </button>
+                <div style={{
+                  fontSize: 32, fontWeight: 800, lineHeight: 1.1,
+                  color: (selectedWallet.balance || 0) >= 0 ? theme.text : "#ef4444",
+                }}>
+                  {fmt(selectedWallet.balance || 0)}
                 </div>
               </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
+                {!isActive && (
+                  <button onClick={() => onSetActiveWallet(selectedWallet.id)} style={{
+                    padding: "6px 12px", borderRadius: 10,
+                    background: theme.surface2,
+                    border: `1px solid ${theme.border}`,
+                    color: theme.accent1, fontSize: 11, fontWeight: 600, cursor: "pointer",
+                    fontFamily: "inherit", whiteSpace: "nowrap",
+                  }}>
+                    ✓ {t.setActive}
+                  </button>
+                )}
+                {isActive && (
+                  <span style={{
+                    padding: "5px 10px", borderRadius: 10, fontSize: 11, fontWeight: 600,
+                    color: theme.accent1,
+                    background: theme.surface2,
+                    border: `1px solid ${theme.border}`,
+                  }}>✓ {t.activeWallet}</span>
+                )}
+                <button
+                  onClick={() => canDelete && onDeleteWallet(selectedWallet.id)}
+                  title={!canDelete ? t.cannotDeleteWallet : t.deleteWallet}
+                  style={{
+                    padding: "5px 10px", borderRadius: 10,
+                    background: "transparent",
+                    border: canDelete ? "1px solid rgba(239,68,68,0.25)" : `1px solid ${theme.border}`,
+                    color: canDelete ? "#ef4444" : theme.textMuted,
+                    fontSize: 11, fontWeight: 600, cursor: canDelete ? "pointer" : "not-allowed",
+                    fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4,
+                  }}
+                >
+                  <IconTrash size={12} color={canDelete ? "#ef4444" : theme.textMuted} />
+                  {t.deleteWallet}
+                </button>
+              </div>
+            </div>
 
-              {/* Summary row */}
-              <div style={{ display: "flex", gap: 10 }}>
-                <div style={{
-                  flex: 1, padding: "9px 12px", borderRadius: 12,
-                  background: isDark ? "rgba(0,229,160,0.08)" : "rgba(5,150,105,0.06)",
-                  border: `1px solid ${isDark ? "rgba(0,229,160,0.15)" : "rgba(5,150,105,0.12)"}`,
-                }}>
-                  <div style={{ fontSize: 10, fontWeight: 600, color: theme.textMuted, textTransform: "uppercase", marginBottom: 3 }}>
-                    {t.totalTopUps}
-                  </div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: theme.accent1 }}>+{fmt(totalTopUps)}</div>
+            {/* Summary row */}
+            <div style={{ display: "flex", gap: 10 }}>
+              <div style={{
+                flex: 1, padding: "9px 12px", borderRadius: 12,
+                background: theme.surface2,
+                border: `1px solid ${theme.border}`,
+              }}>
+                <div style={{ fontSize: 10, fontWeight: 600, color: theme.textMuted, textTransform: "uppercase", marginBottom: 3 }}>
+                  {t.totalTopUps}
                 </div>
-                <div style={{
-                  flex: 1, padding: "9px 12px", borderRadius: 12,
-                  background: isDark ? "rgba(239,68,68,0.08)" : "rgba(239,68,68,0.05)",
-                  border: `1px solid ${isDark ? "rgba(239,68,68,0.15)" : "rgba(239,68,68,0.12)"}`,
-                }}>
-                  <div style={{ fontSize: 10, fontWeight: 600, color: theme.textMuted, textTransform: "uppercase", marginBottom: 3 }}>
-                    {t.totalExpenses}
-                  </div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: "#ef4444" }}>-{fmt(totalExpenses)}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: theme.accent1 }}>+{fmt(totalTopUps)}</div>
+              </div>
+              <div style={{
+                flex: 1, padding: "9px 12px", borderRadius: 12,
+                background: theme.surface2,
+                border: `1px solid ${theme.border}`,
+              }}>
+                <div style={{ fontSize: 10, fontWeight: 600, color: theme.textMuted, textTransform: "uppercase", marginBottom: 3 }}>
+                  {t.totalExpenses}
                 </div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "#ef4444" }}>-{fmt(totalExpenses)}</div>
               </div>
             </div>
           </GlassCard>
@@ -241,18 +234,18 @@ export default function WalletScreen({
         {!showTopUp ? (
           <button onClick={() => setShowTopUp(true)} style={{
             width: "100%", padding: "13px",
-            background: theme.btnGrad, border: "none", borderRadius: 14,
-            color: "#fff", fontSize: 14, fontWeight: 700,
+            background: theme.accent1, border: "none", borderRadius: 12,
+            color: "#fff", fontSize: 14, fontWeight: 600,
             cursor: "pointer", fontFamily: "inherit",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-            boxShadow: "0 4px 16px rgba(56,189,248,0.2)", marginBottom: 14,
+            marginBottom: 14,
           }}>
             <IconPlus size={16} color="#fff" style={{ strokeWidth: 2.5 }} />
             {t.topUp}
           </button>
         ) : (
           <GlassCard theme={theme} style={{ padding: "14px", marginBottom: 14 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: theme.textSub, marginBottom: 10 }}>{t.topUpHint}</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: theme.textSub, marginBottom: 10 }}>{t.topUpHint}</div>
             <input
               type="number" value={topUpAmount}
               onChange={e => setTopUpAmount(e.target.value)}
@@ -262,7 +255,7 @@ export default function WalletScreen({
                 width: "100%", boxSizing: "border-box",
                 background: theme.inputBg, border: `1px solid ${theme.inputBorder}`,
                 borderRadius: 12, padding: "12px 14px",
-                color: theme.text, fontSize: 16, fontWeight: 700,
+                color: theme.text, fontSize: 16, fontWeight: 600,
                 fontFamily: "inherit", outline: "none", marginBottom: 8,
               }}
             />
@@ -280,18 +273,18 @@ export default function WalletScreen({
             />
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={() => setShowTopUp(false)} style={{
-                flex: 1, padding: "11px", background: theme.glass,
-                border: `1px solid ${theme.glassBorder}`, borderRadius: 12,
+                flex: 1, padding: "11px", background: theme.surface2,
+                border: `1px solid ${theme.border}`, borderRadius: 12,
                 color: theme.text, cursor: "pointer", fontFamily: "inherit", fontWeight: 600, fontSize: 13,
               }}>{t.cancel}</button>
               <button onClick={handleTopUp} style={{
                 flex: 1, padding: "11px",
-                background: Number(topUpAmount) > 0 ? theme.btnGrad : theme.glass,
-                border: Number(topUpAmount) > 0 ? "none" : `1px solid ${theme.glassBorder}`,
+                background: Number(topUpAmount) > 0 ? theme.accent1 : theme.surface2,
+                border: Number(topUpAmount) > 0 ? "none" : `1px solid ${theme.border}`,
                 borderRadius: 12,
                 color: Number(topUpAmount) > 0 ? "#fff" : theme.textMuted,
                 cursor: Number(topUpAmount) > 0 ? "pointer" : "not-allowed",
-                fontFamily: "inherit", fontWeight: 700, fontSize: 13,
+                fontFamily: "inherit", fontWeight: 600, fontSize: 13,
               }}>{t.topUp}</button>
             </div>
           </GlassCard>
@@ -318,7 +311,7 @@ export default function WalletScreen({
           </div>
         </GlassCard>
 
-        <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase" }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: theme.textMuted, letterSpacing: 1, textTransform: "uppercase" }}>
           {t.topUps}
         </div>
       </div>
@@ -328,43 +321,42 @@ export default function WalletScreen({
         {sorted.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px 24px", color: theme.textMuted }}>
             <div style={{
-              width: 64, height: 64, borderRadius: 20,
-              background: theme.glass, border: `1px solid ${theme.glassBorder}`,
+              width: 60, height: 60, borderRadius: 18,
+              background: theme.surface2, border: `1px solid ${theme.border}`,
               display: "flex", alignItems: "center", justifyContent: "center",
               margin: "0 auto 14px",
             }}>
-              <IconWallet size={28} color={theme.textMuted} />
+              <IconWallet size={26} color={theme.textMuted} />
             </div>
-            <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4, color: theme.textSub }}>{t.noWalletActivity}</div>
+            <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 4, color: theme.textSub }}>{t.noWalletActivity}</div>
             <div style={{ fontSize: 13 }}>{t.noWalletActivityHint}</div>
           </div>
         ) : sorted.map(tx => {
           const color = theme.accent1;
-          const borderSide = lang === "ar" ? "borderRight" : "borderLeft";
           const isExpanded = expandedId === tx.id;
           return (
             <GlassCard key={tx.id} theme={theme} style={{
               padding: "12px 14px", marginBottom: 8,
-              [borderSide]: `3px solid ${color}`, cursor: "pointer",
+              cursor: "pointer",
             }} onClick={() => setExpandedId(isExpanded ? null : tx.id)}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{
                   width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-                  background: isDark ? "rgba(0,229,160,0.12)" : "rgba(5,150,105,0.08)",
-                  border: `1px solid ${isDark ? "rgba(0,229,160,0.25)" : "rgba(5,150,105,0.2)"}`,
+                  background: theme.surface2,
+                  border: `1px solid ${theme.border}`,
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
                   <IconArrowUp size={20} color={color} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, fontSize: 13, color: theme.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  <div style={{ fontWeight: 600, fontSize: 13, color: theme.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {tx.note || t.topUp}
                   </div>
                   <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 2 }}>
                     {tx.date === todayStr() ? t.today : fmtDate(tx.date, lang, t.months)}
                   </div>
                 </div>
-                <div style={{ fontWeight: 800, fontSize: 16, color, flexShrink: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: 16, color, flexShrink: 0 }}>
                   +{fmt(tx.amount)}
                 </div>
               </div>
@@ -378,7 +370,7 @@ export default function WalletScreen({
                   paddingTop: 10,
                 }}>
                   <button onClick={(e) => { e.stopPropagation(); onDeleteTopUp(tx.id); setExpandedId(null); }} style={{
-                    background: isDark ? "rgba(239,68,68,0.12)" : "rgba(239,68,68,0.08)",
+                    background: "transparent",
                     border: "1px solid rgba(239,68,68,0.25)",
                     borderRadius: 10, color: "#ef4444", fontSize: 12,
                     padding: "6px 14px", cursor: "pointer",

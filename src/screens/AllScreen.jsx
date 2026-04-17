@@ -1,11 +1,10 @@
 import { useState, useMemo } from "react";
 import GlassCard from "../components/GlassCard";
-import GlowBg from "../components/GlowBg";
 import { IconList, IconEdit, IconTrash, IconChevronLeft, IconChevronRight } from "../components/Icons";
 import { cat, CURRENCIES } from "../constants";
 import { todayStr, yesterdayStr, fmtDate, fmtAmt } from "../utils";
 
-export default function AllScreen({ expenses, settings, wallets, theme, isDark, t, lang, curr, onEdit, onDelete }) {
+export default function AllScreen({ expenses, settings, wallets, theme, t, lang, curr, onEdit, onDelete }) {
   const now = new Date();
   const [selYear, setSelYear] = useState(now.getFullYear());
   const [selMonth, setSelMonth] = useState(now.getMonth());
@@ -21,7 +20,6 @@ export default function AllScreen({ expenses, settings, wallets, theme, isDark, 
     const c = filterWalletId === "all" ? walletCurrFor(exp.walletId) : filterCurr;
     return fmtAmt(exp.amount, c.symbol, lang, c.code);
   };
-  const catColor = (id) => isDark ? cat(id).colorDark : cat(id).colorLight;
   const isRTL = lang === "ar";
 
   // Filter expenses for selected month + wallet
@@ -60,7 +58,6 @@ export default function AllScreen({ expenses, settings, wallets, theme, isDark, 
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <GlowBg theme={theme} style={{ position: "fixed" }} />
 
       {/* Header */}
       <div style={{ padding: "56px 24px 0", flexShrink: 0, position: "relative", zIndex: 1, background: theme.bg }}>
@@ -74,16 +71,15 @@ export default function AllScreen({ expenses, settings, wallets, theme, isDark, 
         {/* Month switcher */}
         <div style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          background: theme.glass,
-          border: `1px solid ${theme.glassBorder}`,
-          borderRadius: 16, padding: "6px 6px",
-          backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+          background: theme.surface,
+          border: `1px solid ${theme.border}`,
+          borderRadius: 14, padding: "6px 6px",
           marginBottom: 16,
         }}>
           <button onClick={() => goMonth(isRTL ? 1 : -1)} style={{
-            width: 38, height: 38, borderRadius: 12,
-            background: theme.glassBg2,
-            border: `1px solid ${theme.glassBorder}`,
+            width: 36, height: 36, borderRadius: 10,
+            background: theme.surface2,
+            border: `1px solid ${theme.border}`,
             cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
@@ -93,18 +89,18 @@ export default function AllScreen({ expenses, settings, wallets, theme, isDark, 
           </button>
 
           <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: theme.text }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: theme.text }}>
               {monthLabel}
             </div>
-            <div style={{ fontSize: 11, fontWeight: 600, color: theme.accent1, marginTop: 2 }}>
+            <div style={{ fontSize: 11, fontWeight: 500, color: theme.textSub, marginTop: 2 }}>
               {fmt(monthTotal)} · {sorted.length} {t.transactions}
             </div>
           </div>
 
           <button onClick={() => goMonth(isRTL ? -1 : 1)} style={{
-            width: 38, height: 38, borderRadius: 12,
-            background: isCurrentMonth ? "transparent" : theme.glassBg2,
-            border: `1px solid ${isCurrentMonth ? "transparent" : theme.glassBorder}`,
+            width: 36, height: 36, borderRadius: 10,
+            background: isCurrentMonth ? "transparent" : theme.surface2,
+            border: `1px solid ${isCurrentMonth ? "transparent" : theme.border}`,
             cursor: isCurrentMonth ? "default" : "pointer",
             display: "flex", alignItems: "center", justifyContent: "center",
             opacity: isCurrentMonth ? 0.25 : 1,
@@ -123,11 +119,11 @@ export default function AllScreen({ expenses, settings, wallets, theme, isDark, 
               return (
                 <button key={w.id} onClick={() => { setFilterWalletId(w.id); setExpandedId(null); }} style={{
                   flexShrink: 0, padding: "7px 14px", borderRadius: 20,
-                  background: active ? theme.btnGrad : theme.glass,
-                  border: active ? "none" : `1px solid ${theme.glassBorder}`,
+                  background: active ? theme.accent1 : theme.surface,
+                  border: `1px solid ${active ? theme.accent1 : theme.border}`,
                   color: active ? "#fff" : theme.textSub,
-                  fontSize: 12, fontWeight: 700, cursor: "pointer",
-                  fontFamily: "inherit", backdropFilter: "blur(12px)",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer",
+                  fontFamily: "inherit",
                   whiteSpace: "nowrap",
                 }}>
                   {w.name}
@@ -143,23 +139,23 @@ export default function AllScreen({ expenses, settings, wallets, theme, isDark, 
         {grouped.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px 24px", color: theme.textMuted }}>
             <div style={{
-              width: 80, height: 80, borderRadius: 24,
-              background: theme.glass,
-              border: `1px solid ${theme.glassBorder}`,
+              width: 72, height: 72, borderRadius: 20,
+              background: theme.surface2,
+              border: `1px solid ${theme.border}`,
               display: "flex", alignItems: "center", justifyContent: "center",
-              margin: "0 auto 20px", fontSize: 36,
+              margin: "0 auto 20px", fontSize: 32,
             }}>
               💸
             </div>
-            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 6, color: theme.textSub }}>{t.noTransactions}</div>
+            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6, color: theme.textSub }}>{t.noTransactions}</div>
             <div style={{ fontSize: 13 }}>{t.noTransactionsHint}</div>
           </div>
         ) : grouped.map(group => (
           <div key={group.date}>
             {/* Date header */}
             <div style={{
-              fontSize: 11, fontWeight: 700, color: theme.textMuted,
-              letterSpacing: 1.2, textTransform: "uppercase",
+              fontSize: 11, fontWeight: 600, color: theme.textMuted,
+              letterSpacing: 1, textTransform: "uppercase",
               padding: "8px 8px 6px", marginTop: 4,
               display: "flex", alignItems: "center", justifyContent: "space-between",
             }}>
@@ -168,7 +164,7 @@ export default function AllScreen({ expenses, settings, wallets, theme, isDark, 
                   : group.date === yesterdayStr() ? t.yesterday
                   : fmtDate(group.date, lang, t.months)}
               </span>
-              <span style={{ fontWeight: 800, color: theme.accent1, fontSize: 12, direction: "ltr" }}>
+              <span style={{ fontWeight: 700, color: theme.textSub, fontSize: 12, direction: "ltr" }}>
                 {fmt(group.items.reduce((s, e) => s + Number(e.amount), 0))}
               </span>
             </div>
@@ -176,35 +172,31 @@ export default function AllScreen({ expenses, settings, wallets, theme, isDark, 
             {/* Expense rows */}
             {group.items.map(exp => {
               const c = cat(exp.category);
-              const color = catColor(exp.category);
               const isExpanded = expandedId === exp.id;
-              const borderSide = lang === "ar" ? "borderRight" : "borderLeft";
               return (
                 <GlassCard key={exp.id} theme={theme} onClick={() => setExpandedId(isExpanded ? null : exp.id)} style={{
                   padding: "13px 14px", marginBottom: 8,
                   cursor: "pointer",
-                  [borderSide]: `3px solid ${color}`,
-                  transition: "transform 0.15s ease",
                 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <div style={{
-                      width: 42, height: 42, borderRadius: 13, flexShrink: 0,
-                      background: c.bg + (isDark ? "0.18)" : "0.14)"),
-                      border: `1px solid ${c.bg + (isDark ? "0.30)" : "0.22)")}`,
+                      width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+                      background: theme.surface2,
+                      border: `1px solid ${theme.border}`,
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 20,
+                      fontSize: 19,
                     }}>{c.emoji}</div>
 
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: theme.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div style={{ fontWeight: 600, fontSize: 14, color: theme.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {exp.note || t.cats[exp.category]}
                       </div>
-                      <div style={{ fontSize: 11, color: theme.textSub, marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
+                      <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 2, display: "flex", alignItems: "center", gap: 6 }}>
                         {t.cats[exp.category]}
                         {exp.subcategory && (
                           <span style={{
-                            fontSize: 10, color: catColor(exp.category), fontWeight: 600,
-                            background: c.bg + (isDark ? "0.12)" : "0.10)"),
+                            fontSize: 10, color: theme.textSub, fontWeight: 500,
+                            background: theme.surface2,
                             borderRadius: 6, padding: "1px 6px",
                           }}>{exp.subcategory}</span>
                         )}
@@ -212,7 +204,7 @@ export default function AllScreen({ expenses, settings, wallets, theme, isDark, 
                     </div>
 
                     <div style={{ textAlign: lang === "ar" ? "left" : "right", flexShrink: 0 }}>
-                      <div style={{ fontWeight: 800, fontSize: 15, color }}>{fmtExp(exp)}</div>
+                      <div style={{ fontWeight: 700, fontSize: 15, color: theme.text }}>{fmtExp(exp)}</div>
                     </div>
                   </div>
 
@@ -229,7 +221,7 @@ export default function AllScreen({ expenses, settings, wallets, theme, isDark, 
                       paddingTop: 10,
                     }}>
                       <button onClick={(e) => { e.stopPropagation(); onEdit(exp); }} style={{
-                        background: theme.glassBg2, border: `1px solid ${theme.glassBorder}`,
+                        background: theme.surface2, border: `1px solid ${theme.border}`,
                         borderRadius: 10, color: theme.textSub, fontSize: 12,
                         padding: "6px 14px", cursor: "pointer",
                         display: "flex", alignItems: "center", gap: 5, fontWeight: 600,
@@ -239,7 +231,7 @@ export default function AllScreen({ expenses, settings, wallets, theme, isDark, 
                         {lang === "ar" ? "تعديل" : "Edit"}
                       </button>
                       <button onClick={(e) => { e.stopPropagation(); onDelete(exp.id); }} style={{
-                        background: isDark ? "rgba(239,68,68,0.12)" : "rgba(239,68,68,0.08)",
+                        background: "transparent",
                         border: "1px solid rgba(239,68,68,0.25)",
                         borderRadius: 10, color: "#ef4444", fontSize: 12,
                         padding: "6px 14px", cursor: "pointer",

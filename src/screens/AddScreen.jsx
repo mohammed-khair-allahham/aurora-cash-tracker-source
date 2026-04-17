@@ -1,8 +1,7 @@
 import { useState } from "react";
 import GlassCard from "../components/GlassCard";
-import GlowBg from "../components/GlowBg";
 import { IconChevronLeft, IconChevronRight } from "../components/Icons";
-import { CATEGORIES, CURRENCIES, cat } from "../constants";
+import { CATEGORIES, CURRENCIES } from "../constants";
 import { todayStr } from "../utils";
 
 export default function AddScreen({ theme, isDark, t, lang, curr, editing, wallets, activeWalletId, onSave, onCancel, subcategories, onAddSubcategory }) {
@@ -19,7 +18,7 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, walle
   const activeCurr = CURRENCIES.find(c => c.code === selectedWallet?.currency) || curr;
 
   const valid = amount && !isNaN(Number(amount)) && Number(amount) > 0;
-  const selColor = isDark ? cat(category).colorDark : cat(category).colorLight;
+  const selColor = theme.accent1;
   const catSubs = subcategories[category] || [];
 
   const handleCategoryChange = (catId) => {
@@ -51,20 +50,19 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, walle
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", position: "relative" }}>
-      <GlowBg theme={theme} />
       <div style={{ flex: 1, overflowY: "auto", padding: "52px 20px 100px", position: "relative", zIndex: 1 }}>
 
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
           <button onClick={onCancel} style={{
-            background: theme.glass, border: `1px solid ${theme.glassBorder}`,
+            background: theme.surface, border: `1px solid ${theme.border}`,
             borderRadius: 12, color: theme.text, padding: "9px 12px",
-            cursor: "pointer", backdropFilter: "blur(12px)",
+            cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
             <BackIcon size={18} color={theme.text} />
           </button>
-          <h2 style={{ margin: 0, fontWeight: 800, fontSize: 22, color: theme.text }}>
+          <h2 style={{ margin: 0, fontWeight: 700, fontSize: 22, color: theme.text }}>
             {editing ? t.editExpense : t.addExpense}
           </h2>
         </div>
@@ -72,7 +70,7 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, walle
         {/* Wallet picker */}
         {wallets.length > 1 && (
           <div style={{ marginBottom: 18 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: theme.textMuted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>
               {t.wallet}
             </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -82,11 +80,11 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, walle
                 return (
                   <button key={w.id} onClick={() => setWalletId(w.id)} style={{
                     padding: "9px 16px", borderRadius: 20,
-                    background: active ? theme.btnGrad : theme.glass,
-                    border: active ? "none" : `1px solid ${theme.glassBorder}`,
+                    background: active ? theme.accent1 : theme.surface,
+                    border: `1px solid ${active ? theme.accent1 : theme.border}`,
                     color: active ? "#fff" : theme.textSub,
-                    fontSize: 13, fontWeight: 700, cursor: "pointer",
-                    fontFamily: "inherit", backdropFilter: "blur(12px)",
+                    fontSize: 13, fontWeight: 600, cursor: "pointer",
+                    fontFamily: "inherit",
                   }}>
                     {w.name} · {wCurr?.symbol}
                   </button>
@@ -97,8 +95,8 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, walle
         )}
 
         {/* Amount */}
-        <GlassCard theme={theme} variant="elevated" style={{ padding: "22px 20px", marginBottom: 18, textAlign: "center" }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: theme.textSub, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 14 }}>
+        <GlassCard theme={theme} style={{ padding: "22px 20px", marginBottom: 18, textAlign: "center" }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: theme.textMuted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 14 }}>
             {t.amount} · {activeCurr.code}
           </div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
@@ -107,19 +105,18 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, walle
               onPointerDown={e => { e.preventDefault(); setAmount(v => Math.max(0, (parseFloat(v) || 0) - 10).toString()); }}
               style={{
                 flexShrink: 0,
-                width: 48, height: 48, borderRadius: 16,
-                background: theme.inputBg,
-                border: `1.5px solid ${theme.glassBorder}`,
-                color: theme.textSub, fontSize: 17, fontWeight: 800,
+                width: 46, height: 46, borderRadius: 14,
+                background: theme.surface2,
+                border: `1px solid ${theme.border}`,
+                color: theme.textSub, fontSize: 15, fontWeight: 700,
                 cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                transition: "all 0.15s",
-                userSelect: "none",
+                userSelect: "none", fontFamily: "inherit",
               }}
             >−10</button>
 
             {/* Currency + input */}
             <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
-              <span style={{ fontSize: 24, fontWeight: 800, color: theme.textMuted }}>{activeCurr.symbol}</span>
+              <span style={{ fontSize: 22, fontWeight: 700, color: theme.textMuted }}>{activeCurr.symbol}</span>
               <input
                 type="text" inputMode="decimal" value={amount}
                 onChange={e => {
@@ -131,10 +128,10 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, walle
                 placeholder="0"
                 style={{
                   background: "none", border: "none", outline: "none",
-                  fontSize: lang === "ar" ? 40 : 46, fontWeight: 900,
-                  color: valid ? selColor : theme.textSub,
+                  fontSize: lang === "ar" ? 38 : 44, fontWeight: 800,
+                  color: valid ? theme.text : theme.textMuted,
                   width: "55%", textAlign: "center",
-                  fontFamily: "inherit", transition: "color 0.2s",
+                  fontFamily: "inherit",
                 }}
               />
             </div>
@@ -144,49 +141,44 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, walle
               onPointerDown={e => { e.preventDefault(); setAmount(v => ((parseFloat(v) || 0) + 10).toString()); }}
               style={{
                 flexShrink: 0,
-                width: 48, height: 48, borderRadius: 16,
-                background: valid ? selColor + "22" : theme.inputBg,
-                border: `1.5px solid ${valid ? selColor : theme.glassBorder}`,
-                color: valid ? selColor : theme.textSub, fontSize: 17, fontWeight: 800,
+                width: 46, height: 46, borderRadius: 14,
+                background: theme.surface2,
+                border: `1px solid ${theme.border}`,
+                color: theme.textSub, fontSize: 15, fontWeight: 700,
                 cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                transition: "all 0.15s",
-                userSelect: "none",
+                userSelect: "none", fontFamily: "inherit",
               }}
             >+10</button>
           </div>
-          {/* Animated focus underline */}
+          {/* Focus underline */}
           <div style={{
             height: 2, borderRadius: 1,
-            background: amountFocused ? theme.walletAccent : "transparent",
+            background: amountFocused ? theme.accent1 : "transparent",
             width: amountFocused ? "60%" : "0%",
             margin: "8px auto 0",
-            transition: "background 0.3s, width 0.3s ease-out",
+            transition: "width 0.2s ease-out",
           }} />
         </GlassCard>
 
         {/* Category grid */}
         <div style={{ marginBottom: 18 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: theme.textMuted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>
             {t.category}
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
             {CATEGORIES.map(c => {
-              const color = isDark ? c.colorDark : c.colorLight;
               const active = category === c.id;
               return (
                 <button key={c.id} onClick={() => handleCategoryChange(c.id)} style={{
-                  background: active ? c.bg + (isDark ? "0.20)" : "0.15)") : theme.glass,
-                  border: active ? `1.5px solid ${color}` : `1px solid ${theme.glassBorder}`,
-                  borderRadius: 18, padding: "12px 4px",
+                  background: active ? theme.surface2 : theme.surface,
+                  border: `1px solid ${active ? theme.accent1 : theme.border}`,
+                  borderRadius: 14, padding: "12px 4px",
                   cursor: "pointer", display: "flex", flexDirection: "column",
                   alignItems: "center", gap: 5,
-                  backdropFilter: "blur(12px)",
-                  transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                  transform: active ? "scale(1.05)" : "scale(1)",
-                  boxShadow: active ? `0 0 16px ${c.bg}0.25)` : "none",
+                  fontFamily: "inherit",
                 }}>
                   <span style={{ fontSize: 22 }}>{c.emoji}</span>
-                  <span style={{ fontSize: 10, color: active ? color : theme.textSub, fontWeight: 600 }}>{t.cats[c.id]}</span>
+                  <span style={{ fontSize: 10, color: active ? theme.text : theme.textSub, fontWeight: 600 }}>{t.cats[c.id]}</span>
                 </button>
               );
             })}
@@ -195,7 +187,7 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, walle
 
         {/* Subcategory */}
         <div style={{ marginBottom: 18 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: theme.textMuted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>
             {t.subcategory}
           </div>
           {catSubs.length > 0 && (
@@ -204,14 +196,12 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, walle
                 const active = subcategory === sub;
                 return (
                   <button key={sub} onClick={() => setSubcategory(active ? "" : sub)} style={{
-                    background: active ? cat(category).bg + (isDark ? "0.20)" : "0.15)") : theme.glass,
-                    border: active ? `1.5px solid ${selColor}` : `1px solid ${theme.glassBorder}`,
+                    background: active ? theme.surface2 : theme.surface,
+                    border: `1px solid ${active ? selColor : theme.border}`,
                     borderRadius: 20, padding: "6px 14px",
                     cursor: "pointer", fontSize: 12, fontWeight: 600,
-                    color: active ? selColor : theme.textSub,
-                    backdropFilter: "blur(12px)",
-                    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                    transform: active ? "scale(1.03)" : "scale(1)",
+                    color: active ? theme.text : theme.textSub,
+                    fontFamily: "inherit",
                   }}>
                     {sub}
                   </button>
@@ -228,16 +218,16 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, walle
               style={{ ...inputStyle, flex: 1 }}
             />
             <button onClick={handleAddSub} style={{
-              background: theme.btnGrad, border: "none", borderRadius: 14,
+              background: theme.accent1, border: "none", borderRadius: 14,
               padding: "0 16px", color: "#fff", fontWeight: 700, fontSize: 18,
-              cursor: "pointer", flexShrink: 0,
+              cursor: "pointer", flexShrink: 0, fontFamily: "inherit",
             }}>+</button>
           </div>
         </div>
 
         {/* Note */}
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: theme.textMuted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>
             {t.note}
           </div>
           <input value={note} onChange={e => setNote(e.target.value)} placeholder={t.notePlaceholder} style={inputStyle} />
@@ -245,7 +235,7 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, walle
 
         {/* Date */}
         <div style={{ marginBottom: 28 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: theme.textMuted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>
             {t.date}
           </div>
           <input type="date" value={date} onChange={e => setDate(e.target.value)}
@@ -258,9 +248,7 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, walle
       <div style={{
         padding: "12px 20px max(28px, env(safe-area-inset-bottom, 28px))",
         background: theme.navBg,
-        backdropFilter: "blur(32px)",
-        WebkitBackdropFilter: "blur(32px)",
-        borderTop: `1px solid ${theme.glassBorder}`,
+        borderTop: `1px solid ${theme.border}`,
         position: "fixed", bottom: 0,
         left: "50%", transform: "translateX(-50%)",
         width: "100%", maxWidth: 430,
@@ -269,18 +257,14 @@ export default function AddScreen({ theme, isDark, t, lang, curr, editing, walle
         <button
           onClick={() => valid && onSave({ amount: Number(amount), category, subcategory: subcategory || undefined, note, date, walletId: walletId || wallets[0]?.id })}
           style={{
-            width: "100%", padding: "17px",
-            background: valid ? theme.btnGrad : theme.glass,
-            backgroundSize: valid ? "200% 100%" : undefined,
-            animation: valid ? "shimmer 3s ease-in-out infinite" : "none",
-            border: valid ? "none" : `1px solid ${theme.glassBorder}`,
-            borderRadius: 18,
+            width: "100%", padding: "16px",
+            background: valid ? theme.accent1 : theme.surface2,
+            border: valid ? "none" : `1px solid ${theme.border}`,
+            borderRadius: 14,
             color: valid ? "#fff" : theme.textMuted,
-            fontSize: 16, fontWeight: 800,
+            fontSize: 15, fontWeight: 700,
             cursor: valid ? "pointer" : "not-allowed",
             fontFamily: "inherit",
-            boxShadow: valid ? "0 4px 24px rgba(56,189,248,0.3)" : "none",
-            transition: "all 0.2s",
           }}
         >
           {editing ? t.save : t.add}

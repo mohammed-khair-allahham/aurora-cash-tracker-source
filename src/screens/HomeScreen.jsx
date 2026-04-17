@@ -1,11 +1,10 @@
 import { useState } from "react";
 import GlassCard from "../components/GlassCard";
-import GlowBg from "../components/GlowBg";
 import { IconWallet, IconEdit, IconTrash } from "../components/Icons";
 import { cat } from "../constants";
 import { todayStr, fmtAmt, ls, lsSet } from "../utils";
 
-export default function HomeScreen({ expenses, settings, wallets, theme, isDark, t, lang, curr, notif, onRequestNotif, onEdit, onDelete, onSetActiveWallet }) {
+export default function HomeScreen({ expenses, settings, wallets, theme, t, lang, curr, notif, onRequestNotif, onEdit, onDelete, onSetActiveWallet }) {
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
@@ -13,7 +12,6 @@ export default function HomeScreen({ expenses, settings, wallets, theme, isDark,
   const [iosDismissed, setIosDismissed] = useState(() => ls('iosHintDismissed', false));
   const [expandedId, setExpandedId] = useState(null);
   const fmt = (n) => fmtAmt(n, curr.symbol, lang, curr.code);
-  const catColor = (id) => isDark ? cat(id).colorDark : cat(id).colorLight;
 
   // Active wallet
   const activeWallet = wallets.find(w => w.id === settings.activeWalletId) || wallets[0];
@@ -56,54 +54,31 @@ export default function HomeScreen({ expenses, settings, wallets, theme, isDark,
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <GlowBg theme={theme} style={{ position: "fixed" }} />
 
       {/* Header — fixed in place, never scrolls */}
       <div style={{ padding: "56px 24px 20px", flexShrink: 0, position: "relative", zIndex: 1, background: theme.bg }}>
 
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-          {/* App icon — aurora-themed SVG mark */}
           <div style={{
-            width: 46, height: 46, borderRadius: 14, flexShrink: 0,
-            background: isDark
-              ? "linear-gradient(135deg, #020d1c 0%, #0c2d4d 100%)"
-              : "linear-gradient(135deg, #e0f5ff 0%, #ede9fe 100%)",
+            width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+            background: theme.surface2,
+            border: `1px solid ${theme.border}`,
             display: "flex", alignItems: "center", justifyContent: "center",
-            boxShadow: isDark
-              ? "0 4px 20px rgba(0,229,160,0.25), inset 0 1px 0 rgba(255,255,255,0.06)"
-              : "0 4px 20px rgba(5,150,105,0.2), inset 0 1px 0 rgba(255,255,255,0.8)",
-            border: `1px solid ${isDark ? "rgba(0,229,160,0.2)" : "rgba(5,150,105,0.15)"}`,
-            position: "relative", overflow: "hidden",
           }}>
-            {/* Aurora glow inside icon */}
-            <div style={{
-              position: "absolute", inset: 0,
-              background: isDark
-                ? "radial-gradient(circle at 30% 20%, rgba(0,229,160,0.3) 0%, transparent 60%), radial-gradient(circle at 70% 80%, rgba(167,139,250,0.25) 0%, transparent 60%)"
-                : "radial-gradient(circle at 30% 20%, rgba(5,150,105,0.2) 0%, transparent 60%), radial-gradient(circle at 70% 80%, rgba(109,40,217,0.15) 0%, transparent 60%)",
-            }} />
-            {/* "A" lettermark */}
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ position: "relative", zIndex: 1 }}>
-              <defs>
-                <linearGradient id="auroraIconGrad" x1="0" y1="0" x2="24" y2="24">
-                  <stop offset="0%" stopColor={isDark ? "#00e5a0" : "#059669"} />
-                  <stop offset="100%" stopColor={isDark ? "#a78bfa" : "#7c3aed"} />
-                </linearGradient>
-              </defs>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
               <path d="M12 3L4 21h3.5l1.5-3.5h6L16.5 21H20L12 3zm0 5.5L15 15H9l3-6.5z"
-                fill="url(#auroraIconGrad)" />
+                fill={theme.accent1} />
             </svg>
           </div>
           <div style={{ lineHeight: 1 }}>
             <div style={{
-              fontSize: 20, fontWeight: 900, letterSpacing: -0.5,
-              background: theme.totalGrad,
-              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+              fontSize: 19, fontWeight: 800, letterSpacing: -0.3,
+              color: theme.text,
             }}>
               {lang === "ar" ? "أورورا تراكر" : "Aurora Tracker"}
             </div>
-            <div style={{ fontSize: 11, fontWeight: 600, color: theme.textMuted, marginTop: 2 }}>
+            <div style={{ fontSize: 11, fontWeight: 500, color: theme.textMuted, marginTop: 3 }}>
               {lang === "ar" ? "تتبّع مصاريفك بذكاء" : "Smart expense tracking"}
             </div>
           </div>
@@ -112,19 +87,18 @@ export default function HomeScreen({ expenses, settings, wallets, theme, isDark,
         {/* iOS install banner */}
         {isIOS && !isStandalone && !iosDismissed && (
           <div style={{
-            background: isDark ? "rgba(251,191,36,0.12)" : "rgba(234,179,8,0.10)",
-            border: `1px solid ${isDark ? "rgba(251,191,36,0.3)" : "rgba(234,179,8,0.35)"}`,
+            background: theme.surface2,
+            border: `1px solid ${theme.border}`,
             borderRadius: 12, padding: "10px 14px",
             display: "flex", alignItems: "center", gap: 10,
             marginBottom: 12,
           }}>
-            <span style={{ fontSize: 16 }}>📲</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: isDark ? "#fde68a" : "#92400e", flex: 1 }}>{t.iosInstallHint}</span>
+            <span style={{ fontSize: 14, color: theme.textSub }}>📲</span>
+            <span style={{ fontSize: 13, fontWeight: 500, color: theme.textSub, flex: 1 }}>{t.iosInstallHint}</span>
             <button onClick={() => { lsSet('iosHintDismissed', true); setIosDismissed(true); }} style={{
               background: "none", border: "none", cursor: "pointer",
-              fontSize: 11, fontWeight: 700, color: isDark ? "#fde68a" : "#92400e",
-              padding: "4px 8px", borderRadius: 6,
-              backdropFilter: "blur(4px)",
+              fontSize: 11, fontWeight: 600, color: theme.textMuted,
+              padding: "4px 8px", borderRadius: 6, fontFamily: "inherit",
             }}>{t.iosInstallDismiss}</button>
           </div>
         )}
@@ -132,37 +106,34 @@ export default function HomeScreen({ expenses, settings, wallets, theme, isDark,
         {/* Notification banner */}
         {!notif && (!isIOS || isStandalone) && (
           <div onClick={onRequestNotif} style={{
-            background: isDark ? "rgba(251,191,36,0.12)" : "rgba(234,179,8,0.10)",
-            border: `1px solid ${isDark ? "rgba(251,191,36,0.3)" : "rgba(234,179,8,0.35)"}`,
+            background: theme.surface2,
+            border: `1px solid ${theme.border}`,
             borderRadius: 12, padding: "10px 14px",
             display: "flex", alignItems: "center", gap: 10,
             cursor: "pointer", marginBottom: 20,
           }}>
-            <span style={{ fontSize: 16 }}>🔔</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: isDark ? "#fde68a" : "#92400e" }}>{t.notifOff}</span>
+            <span style={{ fontSize: 14, color: theme.textSub }}>🔔</span>
+            <span style={{ fontSize: 13, fontWeight: 500, color: theme.textSub }}>{t.notifOff}</span>
           </div>
         )}
 
         {/* Unified Dashboard Card */}
-        <GlassCard theme={theme} variant="wallet" style={{ padding: 0, marginBottom: 16, overflow: "hidden" }}>
-          {/* Gradient accent stripe */}
-          <div style={{ height: 3, background: theme.walletAccent }} />
-
+        <GlassCard theme={theme} style={{ padding: 0, marginBottom: 16, overflow: "hidden" }}>
           <div style={{ padding: "18px 20px 0" }}>
             {/* Wallet header row */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 14 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <IconWallet size={15} color={theme.textMuted} />
-                <span style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, letterSpacing: 1.2, textTransform: "uppercase" }}>
+                <IconWallet size={14} color={theme.textMuted} />
+                <span style={{ fontSize: 11, fontWeight: 600, color: theme.textMuted, letterSpacing: 1, textTransform: "uppercase" }}>
                   {t.walletBalance}
                 </span>
               </div>
               {wallets.length > 1 && (
                 <button onClick={switchWallet} style={{
-                  background: isDark ? "rgba(0,229,160,0.10)" : "rgba(5,150,105,0.07)",
-                  border: `1px solid ${isDark ? "rgba(0,229,160,0.2)" : "rgba(5,150,105,0.15)"}`,
+                  background: theme.surface2,
+                  border: `1px solid ${theme.border}`,
                   borderRadius: 10, padding: "4px 10px",
-                  color: theme.accent1, fontSize: 11, fontWeight: 700,
+                  color: theme.textSub, fontSize: 11, fontWeight: 600,
                   cursor: "pointer", fontFamily: "inherit",
                   display: "flex", alignItems: "center", gap: 4,
                 }}>
@@ -170,7 +141,7 @@ export default function HomeScreen({ expenses, settings, wallets, theme, isDark,
                 </button>
               )}
               {wallets.length === 1 && activeWallet && (
-                <span style={{ fontSize: 11, fontWeight: 600, color: theme.textMuted }}>{activeWallet.name}</span>
+                <span style={{ fontSize: 11, fontWeight: 500, color: theme.textMuted }}>{activeWallet.name}</span>
               )}
             </div>
 
@@ -178,15 +149,15 @@ export default function HomeScreen({ expenses, settings, wallets, theme, isDark,
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div style={{ minWidth: 0 }}>
                 <div style={{
-                  fontSize: 32, fontWeight: 900, lineHeight: 1.1,
-                  color: walletBalance >= 0 ? theme.accent1 : "#ef4444",
+                  fontSize: 30, fontWeight: 800, lineHeight: 1.1,
+                  color: walletBalance >= 0 ? theme.text : "#ef4444",
                 }}>
                   {fmt(walletBalance)}
                 </div>
                 {budget > 0 && (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8, fontSize: 11, fontWeight: 600 }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8, fontSize: 11, fontWeight: 500 }}>
                     <span style={{ color: theme.textSub }}>{t.monthlyBudget}: {fmt(budget)}</span>
-                    <span style={{ color: budgetRemaining >= 0 ? theme.accent1 : "#ef4444", fontWeight: 700 }}>
+                    <span style={{ color: budgetRemaining >= 0 ? theme.accent1 : "#ef4444", fontWeight: 600 }}>
                       {budgetRemaining >= 0 ? t.remaining : t.overBudget}: {fmt(Math.abs(budgetRemaining))}
                     </span>
                   </div>
@@ -195,28 +166,23 @@ export default function HomeScreen({ expenses, settings, wallets, theme, isDark,
 
               {/* Circular budget ring */}
               {budget > 0 && (
-                <div style={{ position: "relative", width: 60, height: 60, flexShrink: 0, marginLeft: 12 }}>
-                  <svg width={60} height={60} viewBox="0 0 64 64">
+                <div style={{ position: "relative", width: 58, height: 58, flexShrink: 0, marginLeft: 12 }}>
+                  <svg width={58} height={58} viewBox="0 0 64 64">
                     <circle cx={32} cy={32} r={ringR} fill="none" stroke={theme.progressRing.track} strokeWidth={5} />
                     <circle cx={32} cy={32} r={ringR} fill="none"
-                      stroke="url(#budgetGrad)" strokeWidth={5}
+                      stroke={budgetRemaining >= 0 ? theme.accent1 : "#ef4444"}
+                      strokeWidth={5}
                       strokeLinecap="round"
                       strokeDasharray={ringC}
                       strokeDashoffset={ringOffset}
                       transform="rotate(-90 32 32)"
                       style={{ transition: "stroke-dashoffset 0.8s ease" }}
                     />
-                    <defs>
-                      <linearGradient id="budgetGrad" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stopColor={budgetRemaining >= 0 ? theme.progressRing.g1 : "#ef4444"} />
-                        <stop offset="100%" stopColor={budgetRemaining >= 0 ? theme.progressRing.g2 : "#f97316"} />
-                      </linearGradient>
-                    </defs>
                   </svg>
                   <div style={{
                     position: "absolute", inset: 0,
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 11, fontWeight: 800,
+                    fontSize: 11, fontWeight: 700,
                     color: budgetRemaining >= 0 ? theme.accent1 : "#ef4444",
                   }}>
                     {Math.round(budgetPct)}%
@@ -229,39 +195,27 @@ export default function HomeScreen({ expenses, settings, wallets, theme, isDark,
           {/* Divider */}
           <div style={{
             height: 1, margin: "16px 20px",
-            background: isDark
-              ? "linear-gradient(90deg, transparent, rgba(0,229,160,0.18), rgba(167,139,250,0.18), transparent)"
-              : "linear-gradient(90deg, transparent, rgba(5,150,105,0.18), rgba(109,40,217,0.18), transparent)",
+            background: theme.border,
           }} />
 
           {/* Today's spending box */}
           <div style={{ padding: "0 20px" }}>
             <div style={{
-              borderRadius: 14, padding: "12px 14px",
-              background: isDark ? "rgba(0,229,160,0.06)" : "rgba(5,150,105,0.05)",
-              border: `1px solid ${isDark ? "rgba(0,229,160,0.12)" : "rgba(5,150,105,0.12)"}`,
               display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "4px 0",
             }}>
               <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                  <div style={{
-                    width: 22, height: 22, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center",
-                    background: isDark ? "rgba(0,229,160,0.15)" : "rgba(5,150,105,0.12)",
-                    fontSize: 11,
-                  }}>📉</div>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: theme.textMuted, letterSpacing: 0.8, textTransform: "uppercase" }}>
-                    {t.todayTotal}
-                  </span>
-                </div>
+                <span style={{ fontSize: 10, fontWeight: 600, color: theme.textMuted, letterSpacing: 1, textTransform: "uppercase" }}>
+                  {t.todayTotal}
+                </span>
                 <div style={{
-                  fontSize: 22, fontWeight: 900, lineHeight: 1.15,
-                  background: theme.totalGrad,
-                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                  fontSize: 22, fontWeight: 800, lineHeight: 1.15,
+                  color: theme.text, marginTop: 4,
                 }}>
                   {fmt(todayTotal)}
                 </div>
               </div>
-              <div style={{ fontSize: 12, color: theme.textMuted, fontWeight: 600 }}>
+              <div style={{ fontSize: 12, color: theme.textMuted, fontWeight: 500 }}>
                 {todayExp.length} {t.transactions}
               </div>
             </div>
@@ -269,17 +223,16 @@ export default function HomeScreen({ expenses, settings, wallets, theme, isDark,
 
           {/* Category chips */}
           {todayCats.length > 0 && (
-            <div style={{ padding: "14px 20px 0", display: "flex", flexWrap: "wrap", gap: 7 }}>
+            <div style={{ padding: "14px 20px 0", display: "flex", flexWrap: "wrap", gap: 6 }}>
               {todayCats.map(([catId, total]) => {
                 const c = cat(catId);
-                const color = catColor(catId);
                 return (
                   <div key={catId} style={{
-                    background: c.bg + (isDark ? "0.10)" : "0.08)"),
-                    border: `1px solid ${c.bg + (isDark ? "0.22)" : "0.18)")}`,
+                    background: theme.surface2,
+                    border: `1px solid ${theme.border}`,
                     borderRadius: 20, padding: "4px 10px",
-                    fontSize: 11, fontWeight: 700, color,
-                    display: "flex", alignItems: "center", gap: 4,
+                    fontSize: 11, fontWeight: 600, color: theme.textSub,
+                    display: "flex", alignItems: "center", gap: 5,
                   }}>
                     <span style={{ fontSize: 12 }}>{c.emoji}</span>
                     <span>{fmt(total)}</span>
@@ -299,48 +252,44 @@ export default function HomeScreen({ expenses, settings, wallets, theme, isDark,
         {todayExp.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px 24px", color: theme.textMuted }}>
             <div style={{
-              width: 80, height: 80, borderRadius: 24,
-              background: theme.glass,
-              border: `1px solid ${theme.glassBorder}`,
+              width: 72, height: 72, borderRadius: 20,
+              background: theme.surface2,
+              border: `1px solid ${theme.border}`,
               display: "flex", alignItems: "center", justifyContent: "center",
-              margin: "0 auto 20px", fontSize: 36,
+              margin: "0 auto 20px", fontSize: 32,
             }}>
               💸
             </div>
-            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 6, color: theme.textSub }}>{t.noTransactions}</div>
+            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6, color: theme.textSub }}>{t.noTransactions}</div>
             <div style={{ fontSize: 13 }}>{t.noTransactionsHint}</div>
           </div>
         ) : todayExp.map(exp => {
           const c = cat(exp.category);
-          const color = catColor(exp.category);
           const isExpanded = expandedId === exp.id;
-          const borderSide = lang === "ar" ? "borderRight" : "borderLeft";
           return (
             <GlassCard key={exp.id} theme={theme} onClick={() => setExpandedId(isExpanded ? null : exp.id)} style={{
               padding: "13px 14px", marginBottom: 8,
               cursor: "pointer",
-              [borderSide]: `3px solid ${color}`,
-              transition: "transform 0.15s ease",
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{
-                  width: 42, height: 42, borderRadius: 13, flexShrink: 0,
-                  background: c.bg + (isDark ? "0.18)" : "0.14)"),
-                  border: `1px solid ${c.bg + (isDark ? "0.30)" : "0.22)")}`,
+                  width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+                  background: theme.surface2,
+                  border: `1px solid ${theme.border}`,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 20,
+                  fontSize: 19,
                 }}>{c.emoji}</div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: theme.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  <div style={{ fontWeight: 600, fontSize: 14, color: theme.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {exp.note || t.cats[exp.category]}
                   </div>
-                  <div style={{ fontSize: 11, color: theme.textSub, marginTop: 2, display: "flex", alignItems: "center", gap: 4 }}>
+                  <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 2, display: "flex", alignItems: "center", gap: 6 }}>
                     {t.cats[exp.category]}
                     {exp.subcategory && (
                       <span style={{
-                        fontSize: 10, color: catColor(exp.category), fontWeight: 600,
-                        background: c.bg + (isDark ? "0.12)" : "0.10)"),
+                        fontSize: 10, color: theme.textSub, fontWeight: 500,
+                        background: theme.surface2,
                         borderRadius: 6, padding: "1px 6px",
                       }}>{exp.subcategory}</span>
                     )}
@@ -348,7 +297,7 @@ export default function HomeScreen({ expenses, settings, wallets, theme, isDark,
                 </div>
 
                 <div style={{ textAlign: lang === "ar" ? "left" : "right", flexShrink: 0 }}>
-                  <div style={{ fontWeight: 800, fontSize: 15, color }}>{fmt(exp.amount)}</div>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: theme.text }}>{fmt(exp.amount)}</div>
                 </div>
               </div>
 
@@ -365,7 +314,7 @@ export default function HomeScreen({ expenses, settings, wallets, theme, isDark,
                   paddingTop: 10,
                 }}>
                   <button onClick={(e) => { e.stopPropagation(); onEdit(exp); }} style={{
-                    background: theme.glassBg2, border: `1px solid ${theme.glassBorder}`,
+                    background: theme.surface2, border: `1px solid ${theme.border}`,
                     borderRadius: 10, color: theme.textSub, fontSize: 12,
                     padding: "6px 14px", cursor: "pointer",
                     display: "flex", alignItems: "center", gap: 5, fontWeight: 600,
@@ -375,7 +324,7 @@ export default function HomeScreen({ expenses, settings, wallets, theme, isDark,
                     {lang === "ar" ? "تعديل" : "Edit"}
                   </button>
                   <button onClick={(e) => { e.stopPropagation(); onDelete(exp.id); }} style={{
-                    background: isDark ? "rgba(239,68,68,0.12)" : "rgba(239,68,68,0.08)",
+                    background: "transparent",
                     border: "1px solid rgba(239,68,68,0.25)",
                     borderRadius: 10, color: "#ef4444", fontSize: 12,
                     padding: "6px 14px", cursor: "pointer",

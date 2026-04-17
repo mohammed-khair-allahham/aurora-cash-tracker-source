@@ -1,10 +1,9 @@
 import { useState } from "react";
-import GlowBg from "../components/GlowBg";
 import { IconLock } from "../components/Icons";
 
 const KEYS = ["1","2","3","4","5","6","7","8","9","","0","⌫"];
 
-export default function LockScreen({ theme, isDark, t, onUnlock, onReset }) {
+export default function LockScreen({ theme, t, onUnlock, onReset }) {
   const [pin, setPin] = useState("");
   const [error, setError] = useState(false);
   const [shake, setShake] = useState(false);
@@ -38,17 +37,16 @@ export default function LockScreen({ theme, isDark, t, onUnlock, onReset }) {
       alignItems: "center", justifyContent: "center",
       position: "relative", padding: "24px 24px 40px",
     }}>
-      <GlowBg theme={theme} />
       <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 320, textAlign: "center" }}>
 
         {/* Icon */}
         <div style={{
-          width: 72, height: 72, borderRadius: 22, margin: "0 auto 24px",
-          background: isDark ? "rgba(0,229,160,0.1)" : "rgba(5,150,105,0.08)",
-          border: `1.5px solid ${isDark ? "rgba(0,229,160,0.25)" : "rgba(5,150,105,0.2)"}`,
+          width: 64, height: 64, borderRadius: 18, margin: "0 auto 24px",
+          background: theme.surface2,
+          border: `1px solid ${theme.border}`,
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
-          <IconLock size={32} color={theme.accent1} />
+          <IconLock size={28} color={theme.accent1} />
         </div>
 
         <div style={{ fontSize: 22, fontWeight: 800, color: theme.text, marginBottom: 8 }}>
@@ -97,24 +95,14 @@ export default function LockScreen({ theme, isDark, t, onUnlock, onReset }) {
               onClick={() => handleKey(key)}
               disabled={key === ""}
               style={{
-                height: 68, borderRadius: 18,
-                background: key === ""
-                  ? "transparent"
-                  : key === "⌫"
-                  ? (isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)")
-                  : (isDark ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.8)"),
-                border: key === "" ? "none" : `1px solid ${theme.glassBorder}`,
+                height: 64, borderRadius: 14,
+                background: key === "" ? "transparent" : theme.surface2,
+                border: key === "" ? "none" : `1px solid ${theme.border}`,
                 color: key === "⌫" ? theme.textSub : theme.text,
                 fontSize: key === "⌫" ? 22 : 24,
-                fontWeight: 700,
+                fontWeight: 600,
                 cursor: key === "" ? "default" : "pointer",
                 fontFamily: "inherit",
-                backdropFilter: key !== "" ? "blur(12px)" : "none",
-                WebkitBackdropFilter: key !== "" ? "blur(12px)" : "none",
-                transition: "background 0.15s, transform 0.1s",
-                boxShadow: key !== "" && key !== "⌫"
-                  ? isDark ? "0 2px 8px rgba(0,0,0,0.2)" : "0 2px 8px rgba(0,0,0,0.06)"
-                  : "none",
               }}
             >
               {key}
@@ -133,9 +121,9 @@ export default function LockScreen({ theme, isDark, t, onUnlock, onReset }) {
           </button>
         ) : (
           <div style={{
-            background: isDark ? "rgba(239,68,68,0.10)" : "rgba(239,68,68,0.07)",
+            background: theme.surface,
             border: "1px solid rgba(239,68,68,0.3)",
-            borderRadius: 16, padding: "16px",
+            borderRadius: 14, padding: "16px",
           }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: theme.text, marginBottom: 14 }}>
               {t.resetConfirm}
@@ -143,15 +131,15 @@ export default function LockScreen({ theme, isDark, t, onUnlock, onReset }) {
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => setConfirmReset(false)} style={{
                 flex: 1, padding: "11px",
-                background: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)",
-                border: `1px solid ${theme.glassBorder}`,
+                background: theme.surface2,
+                border: `1px solid ${theme.border}`,
                 borderRadius: 10, color: theme.text,
                 cursor: "pointer", fontFamily: "inherit", fontWeight: 600, fontSize: 13,
               }}>{t.cancel}</button>
               <button onClick={onReset} style={{
                 flex: 1, padding: "11px", background: "#ef4444",
                 border: "none", borderRadius: 10, color: "#fff",
-                cursor: "pointer", fontFamily: "inherit", fontWeight: 700, fontSize: 13,
+                cursor: "pointer", fontFamily: "inherit", fontWeight: 600, fontSize: 13,
               }}>{t.confirm}</button>
             </div>
           </div>

@@ -1,6 +1,5 @@
 import { useState, useRef } from "react";
 import GlassCard from "../components/GlassCard";
-import GlowBg from "../components/GlowBg";
 import { IconSettings, IconGlobe, IconMoon, IconSun, IconBell, IconTrash, IconBook,
   IconChevronRight, IconChevronLeft, IconCalendar, IconShield, IconLock, IconDownload, IconUpload } from "../components/Icons";
 import { ls } from "../utils";
@@ -29,15 +28,11 @@ function ToggleGroup({ options, value, onChange, theme }) {
         return (
           <button key={opt.value} onClick={() => onChange(opt.value)} style={{
             flex: 1, padding: "12px 8px",
-            background: active ? theme.btnGrad : theme.glass,
-            border: active ? "none" : `1px solid ${theme.glassBorder}`,
-            borderRadius: 24, cursor: "pointer",
+            background: active ? theme.accent1 : theme.surface,
+            border: `1px solid ${active ? theme.accent1 : theme.border}`,
+            borderRadius: 12, cursor: "pointer",
             color: active ? "#fff" : theme.textSub,
-            fontFamily: "inherit", fontWeight: 700, fontSize: 14,
-            backdropFilter: "blur(12px)",
-            transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-            transform: active ? "scale(1.02)" : "scale(1)",
-            boxShadow: active ? "0 4px 16px rgba(56,189,248,0.2)" : "none",
+            fontFamily: "inherit", fontWeight: 600, fontSize: 14,
           }}>{opt.label}</button>
         );
       })}
@@ -164,11 +159,10 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, l
 
   return (
     <div style={{ height: "100%", overflowY: "auto", position: "relative" }}>
-      <GlowBg theme={theme} />
       <div style={{ padding: "52px 20px 84px", position: "relative", zIndex: 1 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
           <IconSettings size={24} color={theme.text} />
-          <h2 style={{ margin: 0, fontWeight: 900, fontSize: 26, color: theme.text }}>{t.settings}</h2>
+          <h2 style={{ margin: 0, fontWeight: 800, fontSize: 26, color: theme.text }}>{t.settings}</h2>
         </div>
 
         <Section title={t.language} icon={<IconGlobe size={14} color={theme.textMuted} />} theme={theme}>
@@ -209,7 +203,7 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, l
           <GlassCard theme={theme} style={{ padding: "4px 4px" }}>
             {notif ? (
               <div style={{ padding: "10px 14px" }}>
-                <div style={{ fontSize: 12, color: isDark ? "#34d399" : "#059669", fontWeight: 600, marginBottom: 8 }}>
+                <div style={{ fontSize: 12, color: theme.accent1, fontWeight: 600, marginBottom: 8 }}>
                   ✅ {t.notifOn}
                 </div>
                 <input
@@ -231,12 +225,12 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, l
                 <button onClick={onRequestNotif} style={{
                   width: "100%", padding: "14px",
                   background: "none", border: "none",
-                  color: isDark ? "#fbbf24" : "#d97706",
+                  color: theme.textSub,
                   fontSize: 14, cursor: "pointer",
-                  fontWeight: 700, fontFamily: "inherit",
+                  fontWeight: 600, fontFamily: "inherit",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                 }}>
-                  <IconBell size={16} color={isDark ? "#fbbf24" : "#d97706"} /> {t.enableNotif}
+                  <IconBell size={16} color={theme.textSub} /> {t.enableNotif}
                 </button>
                 {isIOS && !isStandalone && (
                   <div style={{ fontSize: 11, color: theme.textMuted, textAlign: "center", padding: "0 12px 10px" }}>
@@ -259,11 +253,11 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, l
 
             {!pinMode && !pinEnabled && (
               <div>
-                <div style={{ fontSize: 12, color: theme.textSub, fontWeight: 600, marginBottom: 12 }}>{t.setPinWarning}</div>
+                <div style={{ fontSize: 12, color: theme.textSub, fontWeight: 500, marginBottom: 12 }}>{t.setPinWarning}</div>
                 <button onClick={() => { setPinMode("enable-new"); setPinA(""); setPinError(""); }} style={{
-                  width: "100%", padding: "13px", background: theme.btnGrad,
+                  width: "100%", padding: "13px", background: theme.accent1,
                   border: "none", borderRadius: 12, color: "#fff",
-                  fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                  fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                 }}>
                   <IconLock size={16} color="#fff" /> {t.enablePin}
@@ -275,20 +269,20 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, l
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
                   <IconLock size={16} color={theme.accent1} />
-                  <span style={{ fontSize: 13, fontWeight: 700, color: theme.accent1 }}>{t.pinEnabled}</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: theme.accent1 }}>{t.pinEnabled}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <button onClick={() => { setPinMode("change-current"); setPinA(""); setPinError(""); }} style={{
-                    flex: 1, padding: "10px", background: theme.glass,
-                    border: `1px solid ${theme.glassBorder}`, borderRadius: 10,
-                    color: theme.text, fontSize: 12, fontWeight: 700,
+                    flex: 1, padding: "10px", background: theme.surface2,
+                    border: `1px solid ${theme.border}`, borderRadius: 10,
+                    color: theme.text, fontSize: 12, fontWeight: 600,
                     cursor: "pointer", fontFamily: "inherit",
                   }}>{t.changePin}</button>
                   <button onClick={() => { setPinMode("disable-current"); setPinA(""); setPinError(""); }} style={{
                     flex: 1, padding: "10px",
-                    background: isDark ? "rgba(239,68,68,0.10)" : "rgba(239,68,68,0.07)",
+                    background: "transparent",
                     border: "1px solid rgba(239,68,68,0.25)",
-                    borderRadius: 10, color: "#ef4444", fontSize: 12, fontWeight: 700,
+                    borderRadius: 10, color: "#ef4444", fontSize: 12, fontWeight: 600,
                     cursor: "pointer", fontFamily: "inherit",
                   }}>{t.disablePin}</button>
                 </div>
@@ -419,11 +413,9 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, l
               <div style={{
                 padding: "10px 14px", borderRadius: 12, textAlign: "center",
                 fontSize: 13, fontWeight: 600,
-                background: importMsg === t.importSuccess
-                  ? (isDark ? "rgba(0,229,160,0.12)" : "rgba(5,150,105,0.08)")
-                  : (isDark ? "rgba(239,68,68,0.12)" : "rgba(239,68,68,0.08)"),
+                background: theme.surface2,
                 color: importMsg === t.importSuccess ? theme.accent1 : "#ef4444",
-                border: `1px solid ${importMsg === t.importSuccess ? "rgba(0,229,160,0.25)" : "rgba(239,68,68,0.25)"}`,
+                border: `1px solid ${importMsg === t.importSuccess ? theme.border : "rgba(239,68,68,0.25)"}`,
               }}>
                 {importMsg}
               </div>
@@ -453,10 +445,10 @@ export default function SettingsScreen({ settings, onChange, theme, isDark, t, l
           {!confirmClear ? (
             <button onClick={() => setConfirmClear(true)} style={{
               width: "100%", padding: "14px",
-              background: isDark ? "rgba(239,68,68,0.10)" : "rgba(239,68,68,0.07)",
+              background: "transparent",
               border: "1px solid rgba(239,68,68,0.25)",
-              borderRadius: 14, color: "#ef4444",
-              fontSize: 14, cursor: "pointer", fontWeight: 700, fontFamily: "inherit",
+              borderRadius: 12, color: "#ef4444",
+              fontSize: 14, cursor: "pointer", fontWeight: 600, fontFamily: "inherit",
               display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
             }}>
               <IconTrash size={16} color="#ef4444" /> {t.clearData}

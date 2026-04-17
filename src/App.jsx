@@ -380,14 +380,6 @@ export default function App() {
           from { opacity: 0; transform: translateY(12px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        @keyframes fabPulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.06); }
-        }
-        @keyframes shimmer {
-          0% { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
         @keyframes shake {
           0%,100%{transform:translateX(0)}
           20%,60%{transform:translateX(-8px)}
@@ -495,17 +487,15 @@ export default function App() {
           position: "fixed",
           bottom: 90,
           [lang === "ar" ? "left" : "right"]: "max(16px, calc(50vw - 215px + 16px))",
-          width: 60, height: 60, borderRadius: "50%",
-          background: theme.btnGrad,
-          border: "2px solid rgba(255,255,255,0.15)",
+          width: 56, height: 56, borderRadius: "50%",
+          background: theme.accent1,
+          border: "none",
           cursor: "pointer",
           display: "flex", alignItems: "center", justifyContent: "center",
           boxShadow: theme.fabGlow,
           zIndex: 201,
-          animation: "fabPulse 3s ease-in-out infinite",
-          transition: "box-shadow 0.3s",
         }}>
-          <IconPlus size={26} color="#fff" style={{ strokeWidth: 2.5 }} />
+          <IconPlus size={24} color="#fff" style={{ strokeWidth: 2.5 }} />
         </button>
       )}
 

@@ -1,20 +1,10 @@
-export default function GlassCard({ children, style = {}, onClick, theme, variant = "default" }) {
+export default function GlassCard({ children, style = {}, onClick, theme }) {
   const base = {
-    background: theme.glass,
-    border: `1px solid ${theme.glassBorder}`,
-    borderRadius: 20,
-    backdropFilter: "blur(20px)",
-    WebkitBackdropFilter: "blur(20px)",
-    boxShadow: theme.glassShadow,
+    background: theme.surface,
+    border: `1px solid ${theme.border}`,
+    borderRadius: 16,
+    boxShadow: "none",
   };
-
-  if (variant === "elevated") {
-    base.background = theme.cardGrad;
-    base.boxShadow = `${theme.glassShadow}, ${theme.glassInner}`;
-  } else if (variant === "wallet") {
-    base.background = theme.walletGrad;
-    base.boxShadow = `${theme.glassShadow}, ${theme.glassInner}`;
-  }
 
   return (
     <div onClick={onClick} style={{ ...base, ...style }}>
