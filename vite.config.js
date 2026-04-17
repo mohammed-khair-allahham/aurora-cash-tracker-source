@@ -15,13 +15,14 @@ export default defineConfig({
         name: 'Aurora Tracker',
         short_name: 'Aurora Tracker',
         description: 'Track your daily cash spending — Arabic & English',
-        theme_color: '#090e18',
-        background_color: '#090e18',
+        theme_color: '#0E1116',
+        background_color: '#0E1116',
         display: 'standalone',
         orientation: 'portrait',
         scope: base,
         start_url: base,
         icons: [
+          { src: `${base}icons/icon.svg`, sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
           { src: `${base}icons/icon-192.png`, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
           { src: `${base}icons/icon-512.png`, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
         ]

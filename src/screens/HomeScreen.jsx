@@ -66,9 +66,14 @@ export default function HomeScreen({ expenses, settings, wallets, theme, t, lang
             border: `1px solid ${theme.border}`,
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M12 3L4 21h3.5l1.5-3.5h6L16.5 21H20L12 3zm0 5.5L15 15H9l3-6.5z"
-                fill={theme.accent1} />
+            <svg width="26" height="26" viewBox="0 0 512 512" fill="none">
+              <g fill={theme.accent1} fillOpacity="0.22">
+                <rect x="120" y="288" width="68" height="124" rx="34"/>
+                <rect x="222" y="216" width="68" height="196" rx="34"/>
+                <rect x="324" y="144" width="68" height="268" rx="34"/>
+              </g>
+              <path d="M154 288 L256 216 L358 144" stroke={theme.accent1} strokeWidth="32" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+              <circle cx="358" cy="144" r="26" fill={theme.accent1}/>
             </svg>
           </div>
           <div style={{ lineHeight: 1 }}>
