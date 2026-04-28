@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import GlassCard from "../components/GlassCard";
 import { IconChart, IconChevronLeft, IconChevronRight } from "../components/Icons";
-import { CATEGORIES, CHART_RAMP, CHART_WARN } from "../constants";
+import { CATEGORIES, CHART_RAMP, CHART_WARN, CURRENCIES } from "../constants";
 import { todayStr, fmtAmt, getDaysInMonth, getWeekStartStr, fmtShortDate } from "../utils";
 
 function ChartTooltip({ active, payload, theme, fmt }) {
@@ -15,8 +15,6 @@ function ChartTooltip({ active, payload, theme, fmt }) {
 }
 
 export default function ReportsScreen({ expenses, settings, wallets, theme, t, lang, curr }) {
-  const fmt = (n) => fmtAmt(n, curr.symbol, lang, curr.code);
-
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth());
   const [year,  setYear]  = useState(now.getFullYear());
@@ -24,6 +22,10 @@ export default function ReportsScreen({ expenses, settings, wallets, theme, t, l
 
   const filterWallet = wallets.find(w => w.id === filterWalletId) || null;
   const walletBudget = filterWallet?.budget || 0;
+  const filterCurr = filterWallet
+    ? (CURRENCIES.find(c => c.code === filterWallet.currency) || curr)
+    : curr;
+  const fmt = (n) => fmtAmt(n, filterCurr.symbol, lang, filterCurr.code);
 
   const isCurrentMonth = month === now.getMonth() && year === now.getFullYear();
 
